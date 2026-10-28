@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>eInvoicing Implementation – Status Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#f3f5f7;--surface:#fff;--ink:#12233a;--mute:#5b6b7e;--line:#dde3ea;--brand:#0b6e79;--brand-soft:#d9eef0;--p2:#5a4bb5;--p3:#b86e00;--p4:#237a3b;--red:#b3341f;--warn-soft:#fbeccf;--warn:#8a5200;--green:#237a3b;--track:#e6ebf0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1722;--surface:#16222f;--ink:#e8eef5;--mute:#98a8ba;--line:#26364a;--brand:#4cc3cf;--brand-soft:#173a40;--p2:#a99bff;--p3:#f0b04f;--p4:#6fcf8a;--red:#f08a76;--warn-soft:#3b2d12;--warn:#f0b04f;--green:#6fcf8a;--track:#243446;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1722;--surface:#16222f;--ink:#e8eef5;--mute:#98a8ba;--line:#26364a;--brand:#4cc3cf;--brand-soft:#173a40;--p2:#a99bff;--p3:#f0b04f;--p4:#6fcf8a;--red:#f08a76;--warn-soft:#3b2d12;--warn:#f0b04f;--green:#6fcf8a;--track:#243446;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px 36px}
+header{background:var(--ink);color:#fff;padding:24px 0 80px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header{background:#0a1119}}
+header .wrap{padding-bottom:0}
+.top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{font-size:26px;line-height:1.2;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+.sub{color:#b9c6d6;margin:0;font-size:14px}
+.stamp{background:rgba(255,255,255,.1);border-radius:8px;padding:10px 14px;font-size:13px;color:#dfe8f2;min-width:210px}
+.stamp b{display:block;color:#fff;font-size:14px}
+.live{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px}
+.live i{width:8px;height:8px;border-radius:50%;background:#6fcf8a;display:inline-block}
+.live.off i{background:#f0b04f}
+.stamp button{margin-top:6px;font:inherit;font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;cursor:pointer}
+main{margin-top:-56px}
+#banner{display:none;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+h2{font-size:15px;margin:0 0 12px;font-weight:700}
+.summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px;align-items:center;margin-bottom:14px}
+.big{font-size:52px;font-weight:700;line-height:1;color:var(--brand);letter-spacing:-.02em}
+.big small{font-size:22px}
+.lbl{color:var(--mute);font-size:13px;margin-top:4px}
+.bar{height:10px;border-radius:6px;background:var(--track);overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:6px}
+.headline{font-size:17px;font-weight:600;margin:0 0 6px;line-height:1.35}
+.headline+p{margin:0;color:var(--mute)}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;border-top:4px solid var(--brand)}
+.tile.bad{border-top-color:var(--red)}
+.tile .n{font-size:28px;font-weight:700;line-height:1.1}.tile .n span{font-size:14px;color:var(--mute);font-weight:500}
+.tile .t{font-size:13px;color:var(--mute);margin-top:2px}
+.tile .ph{font-size:12px;margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;font-weight:600}
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;margin-bottom:14px}
+.sh,.stage{display:grid;gap:14px;align-items:center}
+.sh{font-size:12px;font-weight:600;color:var(--mute);padding-bottom:6px;border-bottom:1px solid var(--line)}
+.stage{padding:6px 0;font-size:13px}
+.cell{display:flex;align-items:center;gap:8px}
+.track{flex:1;height:12px;background:var(--track);border-radius:4px;overflow:hidden}.track i{display:block;height:100%}
+.cell b{width:44px;text-align:right;font-variant-numeric:tabular-nums;font-size:12px}
+.phase{padding:12px 0;border-top:1px solid var(--line)}.phase:first-child{border-top:0;padding-top:0}
+.phase .row{display:flex;justify-content:space-between;gap:8px;font-weight:600}.phase .row b{font-variant-numeric:tabular-nums}
+.phase .sm{color:var(--mute);font-size:12px;margin-top:6px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tools input,.tools select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.tools input{flex:1;min-width:180px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-size:12px;color:var(--mute);font-weight:600;padding:8px 6px;border-bottom:2px solid var(--line);vertical-align:bottom}
+td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.nm{font-weight:600;white-space:nowrap}
+td.c{text-align:center}
+th:nth-child(n+3):nth-child(-n+9){text-align:center;width:78px}
+.grp td{background:var(--brand-soft);color:var(--brand);font-weight:700;padding:7px 8px}
+.tick{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;align-items:center;justify-content:center;font-size:13px;font-weight:700;line-height:1}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#9aa7b5;margin:0 6px}
+.pill{display:inline-block;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;white-space:nowrap}
+.p-wip{background:var(--brand-soft);color:var(--brand)}.p-idle{background:var(--track);color:var(--mute)}
+.mini{display:flex;align-items:center;gap:6px;min-width:100px}
+.mini .track{height:8px}.mini .track i{background:var(--brand)}
+.mini span{font-variant-numeric:tabular-nums;font-size:12px;width:46px;text-align:right}
+.legend{font-size:12px;color:var(--mute);margin-top:10px}
+.legend .tick{width:16px;height:16px;font-size:10px;vertical-align:middle}.legend .dot{width:8px;height:8px;vertical-align:middle}
+footer{color:var(--mute);font-size:12px;margin-top:16px}
+@media (max-width:860px){.summary,.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:21px}}
+@media print{header{background:#12233a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.tools,.stamp button{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="top">
+<div><h1>eInvoicing Implementation – Status Dashboard</h1><p class="sub" id="sub">Samsotech eInvoicing · Millennium Hotels and Resorts</p></div>
+<div class="stamp">Last refreshed<b id="when">Loading…</b><div class="live" id="live"><i></i><span id="livetxt">Connecting to Google Sheet…</span></div><button id="rf" type="button">Refresh now</button></div>
+</div></div></header>
+<div class="wrap"><main>
+<div id="banner"></div>
+<section class="card summary">
+<div><div class="big" id="ov">–<small>%</small></div><div class="lbl">Overall programme progress (average across all entities, 7 stages each)</div><div class="bar"><i id="ovb" style="width:0"></i></div></div>
+<div><p class="headline" id="hl">Loading data…</p><p id="hp"></p></div>
+</section>
+<section class="tiles" id="tiles"></section>
+<section class="grid2">
+<div class="card"><h2>Entities completed at each stage, by phase</h2><div id="stages"></div></div>
+<div class="card"><h2>Progress by phase</h2><div id="phases"></div></div>
+</section>
+<section class="card">
+<h2>Entity tracker</h2>
+<div class="tools"><input id="q" type="search" placeholder="Search entity" aria-label="Search entity"><select id="ph" aria-label="Phase"></select><select id="st" aria-label="Status"><option value="">All statuses</option><option value="p">In progress</option><option value="n">Not started</option></select></div>
+<div class="tw"><table><thead><tr><th>#</th><th>Entity</th><th>Project kick-off</th><th>EmaraTax onboard</th><th>GAP assessment</th><th>Source system configuration</th><th>SQ portal onboarding</th><th>Testing (UAT)</th><th>Go-live (PROD)</th><th>Progress</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="legend"><span class="tick">✔</span> Stage completed &nbsp;&nbsp; <span class="dot"></span> Not yet completed</div>
+</section>
+<footer>Live source: Millennium eInvoicing tracker (Google Sheet, tab “Sheet1”). A stage counts as complete when its cell says “Completed”. Progress = completed stages ÷ 7.</footer>
+</main></div>
+<script>
+/* ===== CONFIGURATION ===== */
+var CFG={
+  SHEET_ID:"1su0QI-fUpKCn-iUsd_ADMaknVosHT7KZcDz1ZVzBg0w",
+  SHEET_NAME:"Sheet1",
+  CSV_URL:"",          // optional: paste a "Publish to web" CSV link here to use it instead
+  REFRESH_SEC:60
+};
+/* Offline fallback (snapshot of 27 Oct 2026): [entity, phase, stages completed] */
+var FB=[["Grand Millennium Al Wahda","Phase 1",2],["Millennium Hotels and Resorts MEA","Phase 1",2],["Zain Capital","Phase 1",1],["Millennium Plaza Downtown Dubai","Phase 1",2],["The Ritz-Carlton DIFC","Phase 1",1],["Millennium Barsha","Phase 1",2],["Millennium Airport Dubai","Phase 1",2],["Millennium Place Marina","Phase 1",2],["Millennium Downtown Abu Dhabi","Phase 2",0],["Copthorne Downtown Abu Dhabi","Phase 2",0],["Kingsgate Hotel Abu Dhabi by Millennium","Phase 2",0],["Millennium Residences Saadiyat Island","Phase 2",0],["Arady","Phase 2",0],["Zone Parking","Phase 2",0],["Millennium Place Mirdif","Phase 2",0],["Grand Millennium Business Bay","Phase 2",2],["Kingsgate Clock Tower","Phase 2",0],["Millennium Atria","Phase 2",2],["Millennium MontRose","Phase 2",2],["Millennium Lakeview Hotel","Phase 2",0],["Copthorne Hotel Sharjah","Phase 2",0],["Studio M Al Barsha","Phase 2",0],["Copthorne Dubai","Phase 2",0]];
+var S=["Project kick-off","EmaraTax onboard","GAP assessment","Source system config","SQ portal onboarding","Testing (UAT)","Go-live (PROD)"];
+var KEYS=["projectkick","emaratax","gapassess","sourcesystemconf","sqportal","testing","go-live"];
+var COLORS=["var(--brand)","var(--p2)","var(--p3)","var(--p4)"];
+var A=FB.map(function(r){var s=[];for(var i=0;i<7;i++)s.push(i<r[2]?1:0);return{n:r[0],ph:r[1],st:s}});
+var PH=[];
+
+function parseCSV(t){var rows=[],row=[],f="",q=false,i,c;
+ for(i=0;i<t.length;i++){c=t[i];
+  if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c=='"')q=true;
+  else if(c==","){row.push(f);f=""}
+  else if(c=="\n"||c=="\r"){if(c=="\r"&&t[i+1]=="\n")i++;row.push(f);rows.push(row);row=[];f=""}
+  else f+=c}
+ if(f!==""||row.length){row.push(f);rows.push(row)}return rows}
+function norm(s){return String(s||"").replace(/[\u200b\s]/g,"").toLowerCase()}
+function isDone(v){v=norm(v);return v==="completed"||v==="complete"||v==="done"||v==="yes"||v==="✔"}
+function fromRows(rows){
+ var h=-1,i;for(i=0;i<rows.length;i++){if(rows[i].some(function(c){return norm(c)==="property"})){h=i;break}}
+ if(h<0)throw new Error("Header row with 'Property' not found");
+ var H=rows[h].map(norm);
+ function col(k){for(var j=0;j<H.length;j++)if(H[j].indexOf(k)>=0)return j;return -1}
+ var cn=col("property"),cp=col("implementationphase"),cs=KEYS.map(col);
+ if(cn<0||cs.some(function(x){return x<0}))throw new Error("Expected stage columns not found");
+ var out=[];
+ for(i=h+1;i<rows.length;i++){var r=rows[i],n=String(r[cn]||"").replace(/[\u200b]/g,"").trim();if(!n)continue;
+  out.push({n:n,ph:(cp>=0&&String(r[cp]||"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
+ if(!out.length)throw new Error("No entity rows found");return out}
+
+function sc(r){return r.st.reduce(function(a,b){return a+b},0)}
+function sub(p){return A.filter(function(r){return r.ph===p})}
+function prog(g){return g.length?g.reduce(function(a,r){return a+sc(r)},0)/(7*g.length):0}
+function act(g){return g.filter(function(r){return sc(r)>0}).length}
+function cnt(g,k){return g.reduce(function(a,r){return a+r.st[k]},0)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function pc(x){return (x*100).toFixed(1)+"%"}
+
+function renderTop(){
+ var N=A.length;PH=[];A.forEach(function(r){if(PH.indexOf(r.ph)<0)PH.push(r.ph)});PH.sort();
+ var ov=prog(A);
+ document.getElementById("sub").textContent="Samsotech eInvoicing · Millennium Hotels and Resorts · "+N+" entities across "+PH.length+" phase"+(PH.length==1?"":"s");
+ document.getElementById("ov").innerHTML=(ov*100).toFixed(1)+"<small>%</small>";
+ document.getElementById("ovb").style.width=ov*100+"%";
+ var ko=cnt(A,0),live=cnt(A,6),em=cnt(A,1),zero=S.filter(function(s,k){return cnt(A,k)===0});
+ document.getElementById("hl").textContent=live===N?"All entities are live on eInvoicing.":(ko+" of "+N+" entities have kicked off; "+live+" live in production.");
+ document.getElementById("hp").textContent=zero.length?("Not yet started for any entity: "+zero.join(", ")+"."):"Every stage has started for at least one entity.";
+ function pl(f){return PH.map(function(p,i){return '<span style="color:'+COLORS[i%4]+'">'+esc(p)+': '+f(sub(p))+' / '+sub(p).length+'</span>'}).join("")}
+ function tile(cls,n,tot,t,f){return '<div class="tile '+cls+'"><div class="n">'+n+(tot!=null?'<span> of '+tot+'</span>':'')+'</div><div class="t">'+t+'</div><div class="ph">'+pl(f)+'</div></div>'}
+ document.getElementById("tiles").innerHTML=
+  '<div class="tile"><div class="n">'+N+'</div><div class="t">Entities in scope</div><div class="ph">'+PH.map(function(p,i){return '<span style="color:'+COLORS[i%4]+'">'+esc(p)+': '+sub(p).length+'</span>'}).join("")+'</div></div>'+
+  tile("",act(A),N,"Entities in progress",act)+
+  tile("",em,N,"EmaraTax onboarded",function(g){return cnt(g,1)})+
+  tile(live?"":"bad",live,N,"Live on eInvoicing (PROD)",function(g){return cnt(g,6)});
+ var gc="150px repeat("+PH.length+",1fr)";
+ document.getElementById("stages").innerHTML='<div class="sh" style="grid-template-columns:'+gc+'"><span>Stage</span>'+PH.map(function(p,i){return '<span style="color:'+COLORS[i%4]+'">'+esc(p)+' ('+sub(p).length+')</span>'}).join("")+'</div>'+
+  S.map(function(s,k){return '<div class="stage" style="grid-template-columns:'+gc+'"><span>'+s+'</span>'+PH.map(function(p,i){var g=sub(p),v=cnt(g,k);return '<div class="cell"><div class="track"><i style="width:'+(g.length?v/g.length*100:0)+'%;background:'+COLORS[i%4]+'"></i></div><b>'+v+' / '+g.length+'</b></div>'}).join("")+'</div>'}).join("");
+ document.getElementById("phases").innerHTML=PH.map(function(p,i){var g=sub(p),v=prog(g);
+  return '<div class="phase"><div class="row"><span style="color:'+COLORS[i%4]+'">'+esc(p)+' · '+g.length+' entities</span><b>'+pc(v)+'</b></div><div class="bar"><i style="width:'+v*100+'%;background:'+COLORS[i%4]+'"></i></div><div class="sm">'+act(g)+' of '+g.length+' entities in progress · '+cnt(g,1)+' EmaraTax onboarded</div></div>'}).join("");
+ var sel=document.getElementById("ph"),cur=sel.value;
+ sel.innerHTML='<option value="">All phases</option>'+PH.map(function(p){return '<option>'+esc(p)+'</option>'}).join("");
+ sel.value=PH.indexOf(cur)>=0?cur:"";
+}
+function cell(v){return '<td class="c">'+(v?'<span class="tick" title="Completed" aria-label="Completed">✔</span>':'<span class="dot" title="Not completed" aria-label="Not completed"></span>')+'</td>'}
+function renderTable(){
+ var q=document.getElementById("q").value.toLowerCase(),s=document.getElementById("st").value,p=document.getElementById("ph").value,h="",last=null;
+ A.forEach(function(r,i){var d=sc(r),on=d>0;
+  if(s=="p"&&!on)return;if(s=="n"&&on)return;if(p&&r.ph!==p)return;if(q&&r.n.toLowerCase().indexOf(q)<0)return;
+  if(r.ph!==last){last=r.ph;h+='<tr class="grp"><td colspan="11">'+esc(last)+' · '+sub(last).length+' entities</td></tr>'}
+  h+='<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td>'+r.st.map(cell).join("")+'<td><div class="mini"><div class="track"><i style="width:'+d/7*100+'%"></i></div><span>'+(d/7*100).toFixed(2)+'%</span></div></td><td>'+(on?'<span class="pill p-wip">In progress</span>':'<span class="pill p-idle">Not started</span>')+'</td></tr>'});
+ document.getElementById("tb").innerHTML=h||'<tr><td colspan="11">No entities match these filters.</td></tr>'}
+function renderAll(){renderTop();renderTable()}
+
+function setLive(ok,msg){var l=document.getElementById("live");l.className="live"+(ok?"":" off");document.getElementById("livetxt").textContent=msg;
+ var b=document.getElementById("banner");
+ if(ok){b.style.display="none"}else{b.style.display="block";b.textContent="Live connection to the Google Sheet is unavailable, so this page is showing a saved snapshot from 27 October 2026. In Google Sheets, set sharing to “Anyone with the link – Viewer”, then press Refresh now. ("+msg+")"}}
+function load(){
+ var url=CFG.CSV_URL||("https://docs.google.com/spreadsheets/d/"+CFG.SHEET_ID+"/gviz/tq?tqx=out:csv&headers=0&sheet="+encodeURIComponent(CFG.SHEET_NAME));
+ url+=(url.indexOf("?")<0?"?":"&")+"_="+Date.now();
+ return fetch(url,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.text()})
+ .then(function(t){if(/^\s*<(!doctype|html)/i.test(t))throw new Error("Sheet is not publicly viewable");A=fromRows(parseCSV(t));renderAll();
+  var d=new Date();document.getElementById("when").textContent=d.toLocaleString([], {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  setLive(true,"Live · auto-refresh every "+CFG.REFRESH_SEC+"s")})
+ .catch(function(e){document.getElementById("when").textContent="Snapshot (offline)";setLive(false,e.message||"error");renderAll()})}
+["q","ph","st"].forEach(function(id){document.getElementById(id).addEventListener("input",renderTable)});
+document.getElementById("rf").addEventListener("click",load);
+document.addEventListener("visibilitychange",function(){if(!document.hidden)load()});
+renderAll();load();setInterval(load,CFG.REFRESH_SEC*1000);
+</script>
+</body>
+</html>
