@@ -26,6 +26,7 @@ h1{font-size:26px;line-height:1.2;margin:0 0 6px;font-weight:700;letter-spacing:
 .live.off i{background:#f0b04f}
 .stamp button{margin-top:6px;font:inherit;font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;cursor:pointer}
 main{margin-top:-56px}
+.gbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px}.gbar .gl{font-size:12px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.04em;margin-right:4px}.gsel{font:inherit;font-size:14px;font-weight:600;padding:7px 12px;min-width:240px;max-width:100%;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}.chip{font:inherit;font-size:13px;font-weight:600;padding:5px 14px;border-radius:20px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}.chip.on{background:var(--brand);border-color:var(--brand);color:var(--surface)}
 #banner{display:none;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
 h2{font-size:15px;margin:0 0 12px;font-weight:700}
@@ -85,6 +86,7 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 </div></div></header>
 <div class="wrap"><main>
 <div id="banner"></div>
+<div class="gbar" id="gbar"></div>
 <section class="card summary">
 <div><div class="big" id="ov">–<small>%</small></div><div class="lbl">Overall programme progress (average across all entities, 7 stages each)</div><div class="bar"><i id="ovb" style="width:0"></i></div></div>
 <div><p class="headline" id="hl">Loading data…</p><p id="hp"></p></div>
@@ -115,7 +117,7 @@ var FB=[["Grand Millennium Al Wahda","Phase 1",2],["Millennium Hotels and Resort
 var S=["Project kick-off","EmaraTax onboard","GAP assessment","Source system config","SQ portal onboarding","Testing (UAT)","Go-live (PROD)"];
 var KEYS=["projectkick","emaratax","gapassess","sourcesystemconf","sqportal","testing","go-live"];
 var COLORS=["var(--brand)","var(--p2)","var(--p3)","var(--p4)"];
-var A=FB.map(function(r){var s=[];for(var i=0;i<7;i++)s.push(i<r[2]?1:0);return{n:r[0],ph:r[1],st:s}});
+var ALL=FB.map(function(r,x){var s=[];for(var i=0;i<7;i++)s.push(i<r[2]?1:0);return{n:r[0],g:"Millennium",i:x+1,ph:r[1],st:s}});var A=ALL.slice(),GSEL="";
 var PH=[];
 
 function parseCSV(t){var rows=[],row=[],f="",q=false,i,c;
@@ -133,11 +135,11 @@ function fromRows(rows){
  if(h<0)throw new Error("Header row with 'Property' not found");
  var H=rows[h].map(norm);
  function col(k){for(var j=0;j<H.length;j++)if(H[j].indexOf(k)>=0)return j;return -1}
- var cn=col("property"),cp=col("implementationphase"),cs=KEYS.map(col);
+ var cn=col("property"),cp=col("implementationphase"),cg=col("group"),cs=KEYS.map(col);
  if(cn<0||cs.some(function(x){return x<0}))throw new Error("Expected stage columns not found");
  var out=[];
  for(i=h+1;i<rows.length;i++){var r=rows[i],n=String(r[cn]||"").replace(/[\u200b]/g,"").trim();if(!n)continue;
-  out.push({n:n,ph:(cp>=0&&String(r[cp]||"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
+  out.push({n:n,g:(cg>=0&&String(r[cg]||"").replace(/[\u200b]/g,"").trim())||"Ungrouped",i:out.length+1,ph:(cp>=0&&String(r[cp]||"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
  if(!out.length)throw new Error("No entity rows found");return out}
 
 function sc(r){return r.st.reduce(function(a,b){return a+b},0)}
@@ -151,7 +153,7 @@ function pc(x){return (x*100).toFixed(1)+"%"}
 function renderTop(){
  var N=A.length;PH=[];A.forEach(function(r){if(PH.indexOf(r.ph)<0)PH.push(r.ph)});PH.sort();
  var ov=prog(A);
- document.getElementById("sub").textContent="Samsotech eInvoicing · Millennium Hotels and Resorts · "+N+" entities across "+PH.length+" phase"+(PH.length==1?"":"s");
+ document.getElementById("sub").textContent="Samsotech eInvoicing · Millennium Hotels and Resorts · "+(GSEL?"Group: "+GSEL:"All groups")+" · "+N+" entities across "+PH.length+" phase"+(PH.length==1?"":"s");
  document.getElementById("ov").innerHTML=(ov*100).toFixed(1)+"<small>%</small>";
  document.getElementById("ovb").style.width=ov*100+"%";
  var ko=cnt(A,0),live=cnt(A,6),em=cnt(A,1),zero=S.filter(function(s,k){return cnt(A,k)===0});
@@ -179,9 +181,13 @@ function renderTable(){
  A.forEach(function(r,i){var d=sc(r),on=d>0;
   if(s=="p"&&!on)return;if(s=="n"&&on)return;if(p&&r.ph!==p)return;if(q&&r.n.toLowerCase().indexOf(q)<0)return;
   if(r.ph!==last){last=r.ph;h+='<tr class="grp"><td colspan="11">'+esc(last)+' · '+sub(last).length+' entities</td></tr>'}
-  h+='<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td>'+r.st.map(cell).join("")+'<td><div class="mini"><div class="track"><i style="width:'+d/7*100+'%"></i></div><span>'+(d/7*100).toFixed(2)+'%</span></div></td><td>'+(on?'<span class="pill p-wip">In progress</span>':'<span class="pill p-idle">Not started</span>')+'</td></tr>'});
+  h+='<tr><td>'+r.i+'</td><td class="nm">'+esc(r.n)+'</td>'+r.st.map(cell).join("")+'<td><div class="mini"><div class="track"><i style="width:'+d/7*100+'%"></i></div><span>'+(d/7*100).toFixed(2)+'%</span></div></td><td>'+(on?'<span class="pill p-wip">In progress</span>':'<span class="pill p-idle">Not started</span>')+'</td></tr>'});
  document.getElementById("tb").innerHTML=h||'<tr><td colspan="11">No entities match these filters.</td></tr>'}
-function renderAll(){renderTop();renderTable()}
+function renderBar(){var G=[];ALL.forEach(function(r){if(G.indexOf(r.g)<0)G.push(r.g)});G.sort();if(GSEL&&G.indexOf(GSEL)<0)GSEL="";
+ var b=document.getElementById("gbar");
+ var h='<label class="gl" for="gsel">Group</label><select id="gsel" class="gsel"><option value="">All groups ('+ALL.length+')</option>'+G.map(function(g){var c=ALL.filter(function(r){return r.g===g}).length;return '<option value="'+esc(g)+'"'+(GSEL===g?' selected':'')+'>'+esc(g)+' ('+c+')</option>'}).join("")+'</select>';
+ if(b.getAttribute("data-h")!==h){b.innerHTML=h;b.setAttribute("data-h",h)}}
+function renderAll(){A=GSEL?ALL.filter(function(r){return r.g===GSEL}):ALL.slice();renderBar();renderTop();renderTable()}
 
 function setLive(ok,msg){var l=document.getElementById("live");l.className="live"+(ok?"":" off");document.getElementById("livetxt").textContent=msg;
  var b=document.getElementById("banner");
@@ -190,12 +196,13 @@ function load(){
  var url=CFG.CSV_URL||("https://docs.google.com/spreadsheets/d/"+CFG.SHEET_ID+"/gviz/tq?tqx=out:csv&headers=0&sheet="+encodeURIComponent(CFG.SHEET_NAME));
  url+=(url.indexOf("?")<0?"?":"&")+"_="+Date.now();
  return fetch(url,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.text()})
- .then(function(t){if(/^\s*<(!doctype|html)/i.test(t))throw new Error("Sheet is not publicly viewable");A=fromRows(parseCSV(t));renderAll();
+ .then(function(t){if(/^\s*<(!doctype|html)/i.test(t))throw new Error("Sheet is not publicly viewable");ALL=fromRows(parseCSV(t));renderAll();
   var d=new Date();document.getElementById("when").textContent=d.toLocaleString([], {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
   setLive(true,"Live · auto-refresh every "+CFG.REFRESH_SEC+"s")})
  .catch(function(e){document.getElementById("when").textContent="Snapshot (offline)";setLive(false,e.message||"error");renderAll()})}
 ["q","ph","st"].forEach(function(id){document.getElementById(id).addEventListener("input",renderTable)});
 document.getElementById("rf").addEventListener("click",load);
+document.getElementById("gbar").addEventListener("change",function(e){if(e.target.id!=="gsel")return;GSEL=e.target.value;renderAll()});
 document.addEventListener("visibilitychange",function(){if(!document.hidden)load()});
 renderAll();load();setInterval(load,CFG.REFRESH_SEC*1000);
 </script>
