@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>eInvoicing Implementation – Status Dashboard</title>
+<title>Samsotech eInvoicing Dashboard</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{--bg:#f3f5f7;--surface:#fff;--ink:#12233a;--mute:#5b6b7e;--line:#dde3ea;--brand:#0b6e79;--brand-soft:#d9eef0;--p2:#5a4bb5;--p3:#b86e00;--p4:#237a3b;--red:#b3341f;--warn-soft:#fbeccf;--warn:#8a5200;--green:#237a3b;--track:#e6ebf0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -63,7 +63,7 @@ th{text-align:left;font-size:12px;color:var(--mute);font-weight:600;padding:8px 
 td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
 td.nm{font-weight:600;white-space:nowrap}
 td.c{text-align:center}
-th:nth-child(n+3):nth-child(-n+9){text-align:center;width:78px}
+#v1 th:nth-child(n+3):nth-child(-n+9){text-align:center;width:78px}
 .grp td{background:var(--brand-soft);color:var(--brand);font-weight:700;padding:7px 8px}
 .tick{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;align-items:center;justify-content:center;font-size:13px;font-weight:700;line-height:1}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#9aa7b5;margin:0 6px}
@@ -75,23 +75,64 @@ th:nth-child(n+3):nth-child(-n+9){text-align:center;width:78px}
 .legend{font-size:12px;color:var(--mute);margin-top:10px}
 .legend .tick{width:16px;height:16px;font-size:10px;vertical-align:middle}.legend .dot{width:8px;height:8px;vertical-align:middle}
 footer{color:var(--mute);font-size:12px;margin-top:16px}
-@media (max-width:860px){.summary,.grid2{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:21px}}
+#auth{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:#12233a;padding:20px;overflow:auto}
+.acard{background:var(--surface);color:var(--ink);border-radius:14px;padding:28px;width:100%;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.acard h1{font-size:22px;margin:0 0 4px}.asub{color:var(--mute);margin:0 0 18px;font-size:13px}
+.acard label{display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:12px}
+.acard input{display:block;width:100%;margin-top:4px;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.acard button{width:100%;font:inherit;font-weight:700;padding:11px;border:0;border-radius:8px;background:var(--brand);color:var(--surface);cursor:pointer;margin-top:4px}
+.acard button:disabled{opacity:.6;cursor:wait}
+.ahint{font-size:13px;color:var(--mute);margin:0 0 14px;line-height:1.5}.ahint b{color:var(--ink)}
+.amsg{color:var(--red);font-size:13px;margin-top:12px;min-height:18px}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tab{font:inherit;font-size:14px;font-weight:700;padding:9px 18px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--mute);cursor:pointer}
+.tab.on{background:var(--brand);border-color:var(--brand);color:var(--surface)}
+.brow{display:grid;grid-template-columns:minmax(110px,1.3fr) 2fr 84px;gap:12px;align-items:center;padding:7px 0;font-size:13px}
+.brow .l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.brow small{display:block;color:var(--mute);font-size:11px}
+.brow b{text-align:right;font-variant-numeric:tabular-nums}
+.r{text-align:right!important;font-variant-numeric:tabular-nums}
+.p-ok{background:rgba(35,122,59,.16);color:var(--green)}.p-warn{background:var(--warn-soft);color:var(--warn)}.p-bad{background:rgba(179,52,31,.15);color:var(--red)}
+.tot td{font-weight:700;border-top:2px solid var(--line)}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.toprow .tabs{margin:0}.toprow .gbar{margin:0 0 0 auto;padding:6px 12px}
+.eye{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--brand);cursor:pointer;padding:0}.eye:hover{background:var(--brand-soft)}
+.modal{position:fixed;inset:0;z-index:80;background:rgba(10,17,25,.6);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.mcard{background:var(--surface);color:var(--ink);border-radius:14px;width:100%;max-width:1100px;max-height:92vh;overflow:auto;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.mhead h2{margin:0;font-size:18px}
+#mclose{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;width:32px;height:32px;cursor:pointer}
+.mrow{display:grid;gap:14px 20px;padding:14px 0;border-top:1px solid var(--line)}.mrow:first-child{border-top:0;padding-top:0}
+.m7{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}.m4,.m3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.fl{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin-bottom:3px}
+.fv{font-size:14px;font-weight:600;word-break:break-word;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cpy{font:inherit;font-size:12px;font-weight:600;padding:2px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--brand);cursor:pointer}.cpy.ok{background:rgba(35,122,59,.16);color:var(--green);border-color:transparent}
+.sthead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:14px}.sthead h2{margin:0}.sthead span{font-size:12px;color:var(--mute)}.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px 40px}.si{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;line-height:1.55}.tg{flex:0 0 92px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 0;border-radius:5px;text-transform:uppercase;margin-top:1px}.t-ok{background:rgba(35,122,59,.16);color:var(--green)}.t-next{background:var(--brand-soft);color:var(--brand)}.t-pend{background:var(--warn-soft);color:var(--warn)}.t-att{background:rgba(179,52,31,.15);color:var(--red)}.mu{color:var(--mute)}
+@media (max-width:860px){.summary,.grid2,.stgrid{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:21px}}
 @media print{header{background:#12233a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.tools,.stamp button{display:none}}
 </style>
 </head>
 <body>
+<div id="modal" class="modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="mcard"><div class="mhead"><h2 id="mt"></h2><button type="button" id="mclose" aria-label="Close">✕</button></div><div id="mbody"></div></div></div>
+<div id="auth"><div class="acard">
+<h1>Samsotech eInvoicing Dashboard</h1><p class="asub">Sign in to continue</p>
+<form id="fLogin"><label>Username<input id="lu" autocomplete="username" autocapitalize="none" required></label><label>Password<input id="lp" type="password" autocomplete="current-password" required></label><button id="bLogin" type="submit">Sign in</button></form>
+<form id="fChange" style="display:none"><p class="ahint"><b>Set a new password.</b> This is your first sign-in, so please replace the temporary password. Use at least 8 characters, with an uppercase letter, a lowercase letter and a number.</p><label>New password<input id="np" type="password" autocomplete="new-password" required></label><label>Confirm new password<input id="np2" type="password" autocomplete="new-password" required></label><button id="bChange" type="submit">Save password and continue</button></form>
+<div class="amsg" id="amsg" role="alert"></div>
+</div></div>
 <header><div class="wrap"><div class="top">
-<div><h1>eInvoicing Implementation – Status Dashboard</h1><p class="sub" id="sub">Samsotech eInvoicing · Millennium Hotels and Resorts</p></div>
-<div class="stamp">Last refreshed<b id="when">Loading…</b><div class="live" id="live"><i></i><span id="livetxt">Connecting to Google Sheet…</span></div><button id="rf" type="button">Refresh now</button></div>
+<div><h1>Samsotech eInvoicing Dashboard</h1><p class="sub" id="sub">&nbsp;</p></div>
+<div class="stamp">Last refreshed<b id="when">Loading…</b><div class="live" id="live"><i></i><span id="livetxt">Connecting to Google Sheet…</span></div><button id="rf" type="button">Refresh now</button> <button id="lo" type="button">Sign out</button><div class="live" style="margin-top:6px">Signed in as&nbsp;<span id="who"></span></div></div>
 </div></div></header>
 <div class="wrap"><main>
 <div id="banner"></div>
-<div class="gbar" id="gbar"></div>
+<div class="toprow"><div class="tabs" id="tabs"><button type="button" class="tab on" data-v="1">Implementation status</button><button type="button" class="tab" data-v="2">Order Summary</button></div>
+<div class="gbar" id="gbar"></div></div>
+<div id="v1">
 <section class="card summary">
 <div><div class="big" id="ov">–<small>%</small></div><div class="lbl">Overall programme progress (average across all entities, 7 stages each)</div><div class="bar"><i id="ovb" style="width:0"></i></div></div>
 <div><p class="headline" id="hl">Loading data…</p><p id="hp"></p></div>
 </section>
 <section class="tiles" id="tiles"></section>
+<section class="card" style="margin-bottom:14px"><div class="sthead"><h2 id="sttitle">Status update</h2><span>Drawn from the project tracker</span></div><div class="stgrid" id="stgrid"></div></section>
 <section class="grid2">
 <div class="card"><h2>Entities completed at each stage, by phase</h2><div id="stages"></div></div>
 <div class="card"><h2>Progress by phase</h2><div id="phases"></div></div>
@@ -99,23 +140,27 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 <section class="card">
 <h2>Entity tracker</h2>
 <div class="tools"><input id="q" type="search" placeholder="Search entity" aria-label="Search entity"><select id="ph" aria-label="Phase"></select><select id="st" aria-label="Status"><option value="">All statuses</option><option value="p">In progress</option><option value="n">Not started</option></select></div>
-<div class="tw"><table><thead><tr><th>#</th><th>Entity</th><th>Project kick-off</th><th>EmaraTax onboard</th><th>GAP assessment</th><th>Source system configuration</th><th>SQ portal onboarding</th><th>Testing (UAT)</th><th>Go-live (PROD)</th><th>Progress</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="tw"><table><thead><tr><th>#</th><th>Entity</th><th>Project kick-off</th><th>EmaraTax onboard</th><th>Gap assessment</th><th>Source system configuration</th><th>ASP onboarding</th><th>Testing (UAT)</th><th>Go-live (PROD)</th><th>Progress</th><th>Status</th><th></th></tr></thead><tbody id="tb"></tbody></table></div>
 <div class="legend"><span class="tick">✔</span> Stage completed &nbsp;&nbsp; <span class="dot"></span> Not yet completed</div>
 </section>
-<footer>Live source: Millennium eInvoicing tracker (Google Sheet, tab “Sheet1”). A stage counts as complete when its cell says “Completed”. Progress = completed stages ÷ 7.</footer>
+</div>
+<div id="v2" style="display:none">
+<div id="xnote" class="mu" style="margin-bottom:10px"></div>
+<section class="tiles" id="xtiles" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))"></section>
+<section class="grid2"><div class="card"><h2>Transactions by group</h2><div id="xgrp"></div></div><div class="card"><h2>Transactions by ASP provider</h2><div id="xasp"></div></div></section>
+<section class="grid2"><div class="card"><h2>Work order (WO) status</h2><div class="tw" id="xwo"></div></div><div class="card"><h2>ASP provider</h2><div class="tw" id="xmat"></div></div></section>
+<section class="card"><h2>Transactions by entity</h2>
+<div class="tools"><input id="xq" type="search" placeholder="Search entity" aria-label="Search entity"><select id="xf1" aria-label="ASP provider"></select><select id="xf2" aria-label="WO status"></select><select id="xf3" aria-label="Group"></select></div>
+<div class="tw"><table class="xt"><thead><tr><th>#</th><th>Entity</th><th>Group</th><th>ASP provider</th><th>WO status</th><th class="r">Transactions</th><th></th></tr></thead><tbody id="xtb"></tbody></table></div>
+</section>
+</div>
 </main></div>
 <script>
 /* ===== CONFIGURATION ===== */
-var CFG={
-  SHEET_ID:"1su0QI-fUpKCn-iUsd_ADMaknVosHT7KZcDz1ZVzBg0w",
-  SHEET_NAME:"Sheet1",
-  CSV_URL:"",          // optional: paste a "Publish to web" CSV link here to use it instead
-  REFRESH_SEC:60
-};
-/* Offline fallback (snapshot of 27 Oct 2026): [entity, phase, stages completed] */
-var FB=[["Grand Millennium Al Wahda","Phase 1",2],["Millennium Hotels and Resorts MEA","Phase 1",2],["Zain Capital","Phase 1",1],["Millennium Plaza Downtown Dubai","Phase 1",2],["The Ritz-Carlton DIFC","Phase 1",1],["Millennium Barsha","Phase 1",2],["Millennium Airport Dubai","Phase 1",2],["Millennium Place Marina","Phase 1",2],["Millennium Downtown Abu Dhabi","Phase 2",0],["Copthorne Downtown Abu Dhabi","Phase 2",0],["Kingsgate Hotel Abu Dhabi by Millennium","Phase 2",0],["Millennium Residences Saadiyat Island","Phase 2",0],["Arady","Phase 2",0],["Zone Parking","Phase 2",0],["Millennium Place Mirdif","Phase 2",0],["Grand Millennium Business Bay","Phase 2",2],["Kingsgate Clock Tower","Phase 2",0],["Millennium Atria","Phase 2",2],["Millennium MontRose","Phase 2",2],["Millennium Lakeview Hotel","Phase 2",0],["Copthorne Hotel Sharjah","Phase 2",0],["Studio M Al Barsha","Phase 2",0],["Copthorne Dubai","Phase 2",0]];
-var S=["Project kick-off","EmaraTax onboard","GAP assessment","Source system config","SQ portal onboarding","Testing (UAT)","Go-live (PROD)"];
-var KEYS=["projectkick","emaratax","gapassess","sourcesystemconf","sqportal","testing","go-live"];
+var CFG={REFRESH_SEC:60,API_URL:"https://script.google.com/macros/s/AKfycbyMtzdsWVg899LFab0txpSSdhAAO5MFAK6KgOIIl00E_ZVn1nvb8T_x-Eg4BL4TVbr7/exec"};   // data is read from the Google Sheet by Code.gs (see getSheetData)
+var FB=[]; /* no embedded data: the page always reads the live sheet */
+var S=["Project kick-off","EmaraTax onboard","Gap assessment","Source system config","ASP onboarding","Testing (UAT)","Go-live (PROD)"];
+var KEYS=["projectkick","emaratax","gapassess","sourcesystemconf",["sqportal","asponboard","aspportal"],"testing","go-live"];
 var COLORS=["var(--brand)","var(--p2)","var(--p3)","var(--p4)"];
 var ALL=FB.map(function(r,x){var s=[];for(var i=0;i<7;i++)s.push(i<r[2]?1:0);return{n:r[0],g:"Millennium",i:x+1,ph:r[1],st:s}});var A=ALL.slice(),GSEL="";
 var PH=[];
@@ -130,16 +175,24 @@ function parseCSV(t){var rows=[],row=[],f="",q=false,i,c;
  if(f!==""||row.length){row.push(f);rows.push(row)}return rows}
 function norm(s){return String(s||"").replace(/[\u200b\s]/g,"").toLowerCase()}
 function isDone(v){v=norm(v);return v==="completed"||v==="complete"||v==="done"||v==="yes"||v==="✔"}
+function clean(v){return String(v||"").replace(/[\u200b]/g,"").trim()}
+function num(v){var n=parseFloat(String(v||"").replace(/[^0-9.\-]/g,""));return isNaN(n)?0:n}
+var EXTRA={asp:true,wo:true,tx:true};
+function has(r,j){return j>=0&&String(r[j]||"").replace(/[\u200b\s]/g,"")!==""}
 function fromRows(rows){
  var h=-1,i;for(i=0;i<rows.length;i++){if(rows[i].some(function(c){return norm(c)==="property"})){h=i;break}}
  if(h<0)throw new Error("Header row with 'Property' not found");
  var H=rows[h].map(norm);
- function col(k){for(var j=0;j<H.length;j++)if(H[j].indexOf(k)>=0)return j;return -1}
- var cn=col("property"),cp=col("implementationphase"),cg=col("group"),cs=KEYS.map(col);
- if(cn<0||cs.some(function(x){return x<0}))throw new Error("Expected stage columns not found");
+ function col(k){var ks=[].concat(k);for(var q=0;q<ks.length;q++)for(var j=0;j<H.length;j++)if(H[j].indexOf(ks[q])>=0)return j;return -1}
+ function cx(k){for(var j=0;j<H.length;j++)if(H[j]===k)return j;return col(k)}
+ var cf=["dofname","dofemail","itemailid","phone","trn","tin","sourcesystem","version"].map(function(k){return cx(k)});
+ var cn=col("property"),cp=col("implementationphase"),cg=col("group"),cl=col("sl."),css=col("sourcesystem"),cv=col("version"),ct=col("trn"),cap=col("aspprovider"),cwo=col("wostatus"),ctc=col("transactioncount"),cs=KEYS.map(col);
+ var lost=[];if(cn<0)lost.push("Property");cs.forEach(function(x,k){if(x<0)lost.push(S[k])});
+ if(lost.length)throw new Error("Column header not found in the sheet: "+lost.join(", "));
  var out=[];
  for(i=h+1;i<rows.length;i++){var r=rows[i],n=String(r[cn]||"").replace(/[\u200b]/g,"").trim();if(!n)continue;
-  out.push({n:n,g:(cg>=0&&String(r[cg]||"").replace(/[\u200b]/g,"").trim())||"Ungrouped",i:out.length+1,ph:(cp>=0&&String(r[cp]||"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
+  out.push({n:n,g:(cg>=0&&String(r[cg]||"").replace(/[\u200b]/g,"").trim())||"Ungrouped",i:String(r[cl]||"").replace(/[\u200b]/g,"").trim()||out.length+1,x:out.length,f:{dn:clean(r[cf[0]]),de:clean(r[cf[1]]),ie:clean(r[cf[2]]),ph:clean(r[cf[3]]),trn:clean(r[cf[4]]),tin:clean(r[cf[5]]),src:clean(r[cf[6]]),ver:clean(r[cf[7]])},ss:has(r,css),asp:clean(cap>=0?r[cap]:"")||"Not assigned",wo:clean(cwo>=0?r[cwo]:"")||"Not set",tx:num(ctc>=0?r[ctc]:""),ver:has(r,cv),trn:has(r,ct),ph:(cp>=0&&String(r[cp]||"").replace(/[\u200b]/g,"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
+ EXTRA={asp:cap>=0,wo:cwo>=0,tx:ctc>=0};
  if(!out.length)throw new Error("No entity rows found");return out}
 
 function sc(r){return r.st.reduce(function(a,b){return a+b},0)}
@@ -153,7 +206,7 @@ function pc(x){return (x*100).toFixed(1)+"%"}
 function renderTop(){
  var N=A.length;PH=[];A.forEach(function(r){if(PH.indexOf(r.ph)<0)PH.push(r.ph)});PH.sort();
  var ov=prog(A);
- document.getElementById("sub").textContent="Samsotech eInvoicing · Millennium Hotels and Resorts · "+(GSEL?"Group: "+GSEL:"All groups")+" · "+N+" entities across "+PH.length+" phase"+(PH.length==1?"":"s");
+ document.getElementById("sub").textContent=(GSEL?"Group: "+GSEL:"All groups")+" · "+N+(N==1?" entity":" entities");
  document.getElementById("ov").innerHTML=(ov*100).toFixed(1)+"<small>%</small>";
  document.getElementById("ovb").style.width=ov*100+"%";
  var ko=cnt(A,0),live=cnt(A,6),em=cnt(A,1),zero=S.filter(function(s,k){return cnt(A,k)===0});
@@ -177,34 +230,139 @@ function renderTop(){
 }
 function cell(v){return '<td class="c">'+(v?'<span class="tick" title="Completed" aria-label="Completed">✔</span>':'<span class="dot" title="Not completed" aria-label="Not completed"></span>')+'</td>'}
 function renderTable(){
- var q=document.getElementById("q").value.toLowerCase(),s=document.getElementById("st").value,p=document.getElementById("ph").value,h="",last=null;
- A.forEach(function(r,i){var d=sc(r),on=d>0;
+ var q=document.getElementById("q").value.toLowerCase(),s=document.getElementById("st").value,p=document.getElementById("ph").value,h="",last=null,cnt=0;
+ PH.reduce(function(a,p){return a.concat(sub(p))},[]).forEach(function(r){var d=sc(r),on=d>0;
   if(s=="p"&&!on)return;if(s=="n"&&on)return;if(p&&r.ph!==p)return;if(q&&r.n.toLowerCase().indexOf(q)<0)return;
-  if(r.ph!==last){last=r.ph;h+='<tr class="grp"><td colspan="11">'+esc(last)+' · '+sub(last).length+' entities</td></tr>'}
-  h+='<tr><td>'+r.i+'</td><td class="nm">'+esc(r.n)+'</td>'+r.st.map(cell).join("")+'<td><div class="mini"><div class="track"><i style="width:'+d/7*100+'%"></i></div><span>'+(d/7*100).toFixed(2)+'%</span></div></td><td>'+(on?'<span class="pill p-wip">In progress</span>':'<span class="pill p-idle">Not started</span>')+'</td></tr>'});
- document.getElementById("tb").innerHTML=h||'<tr><td colspan="11">No entities match these filters.</td></tr>'}
+  if(r.ph!==last){last=r.ph;h+='<tr class="grp"><td colspan="12">'+esc(last)+' · '+sub(last).length+' entities</td></tr>'}
+  h+='<tr><td>'+(++cnt)+'</td><td class="nm">'+esc(r.n)+'</td>'+r.st.map(cell).join("")+'<td><div class="mini"><div class="track"><i style="width:'+d/7*100+'%"></i></div><span>'+(d/7*100).toFixed(2)+'%</span></div></td><td>'+(on?'<span class="pill p-wip">In progress</span>':'<span class="pill p-idle">Not started</span>')+'</td><td>'+eye(r)+'</td></tr>'});
+ document.getElementById("tb").innerHTML=h||'<tr><td colspan="12">No entities match these filters.</td></tr>'}
 function renderBar(){var G=[];ALL.forEach(function(r){if(G.indexOf(r.g)<0)G.push(r.g)});G.sort();if(GSEL&&G.indexOf(GSEL)<0)GSEL="";
  var b=document.getElementById("gbar");
  var h='<label class="gl" for="gsel">Group</label><select id="gsel" class="gsel"><option value="">All groups ('+ALL.length+')</option>'+G.map(function(g){var c=ALL.filter(function(r){return r.g===g}).length;return '<option value="'+esc(g)+'"'+(GSEL===g?' selected':'')+'>'+esc(g)+' ('+c+')</option>'}).join("")+'</select>';
  if(b.getAttribute("data-h")!==h){b.innerHTML=h;b.setAttribute("data-h",h)}}
-function renderAll(){A=GSEL?ALL.filter(function(r){return r.g===GSEL}):ALL.slice();renderBar();renderTop();renderTable()}
+function nl(a,k){return a.slice(0,k).map(esc).join(", ")+(a.length>k?" and "+(a.length-k)+" more":"")}
+function renderStatus(){
+ var N=A.length,g=document.getElementById("stgrid");
+ if(!N){g.innerHTML="";return}
+ var em=cnt(A,1),ko=cnt(A,0),gap=cnt(A,2),live=cnt(A,6);
+ document.getElementById("sttitle").textContent="Status update · "+new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+ var ready=A.filter(function(r){return r.st[0]&&r.st[1]&&!r.st[2]}).length;
+ var emNoKo=A.filter(function(r){return r.st[1]&&!r.st[0]}).map(function(r){return r.n});
+ var first=PH.filter(function(p){return /\d/.test(p)})[0];
+ var idle=first?sub(first).filter(function(r){return sc(r)===0}).map(function(r){return r.n}):[];
+ var unas=A.filter(function(r){return r.ph==="Unassigned"}).length;
+ var ss=A.filter(function(r){return r.ss}).length,vr=A.filter(function(r){return r.ver}).length,tr=A.filter(function(r){return r.trn}).length;
+ var done='<b>'+em+'</b> of <b>'+N+'</b> entities have finished EmaraTax onboarding and <b>'+ko+'</b> have held their kick-off meeting.'+(live?' <b>'+live+'</b> are live in production.':'');
+ var next='<b>'+ready+'</b> entities have both kick-off and EmaraTax complete and are positioned for the gap assessment. '+(gap?'<b>'+gap+'</b> have completed the gap assessment.':'No gap assessment has been recorded yet at any entity.');
+ var pend='<b>'+(N-em)+'</b> entities still need EmaraTax onboarding and <b>'+(N-ko)+'</b> still need a kick-off.'+(emNoKo.length?' <b>'+emNoKo.length+'</b> of those have EmaraTax done without a kick-off recorded.':'');
+ var att=[];
+ if(idle.length)att.push('<b>'+idle.length+'</b> '+esc(first)+' entities show no activity: <b>'+nl(idle,4)+'</b>.');
+ if(unas)att.push('<b>'+unas+'</b> entities have no implementation phase set.');
+ att.push('Source system is recorded for <b>'+ss+'</b> of '+N+' entities; version for <b>'+vr+'</b>. TRN is on file for <b>'+tr+'</b>.');
+ function item(c,t,x){return '<div class="si"><span class="tg '+c+'">'+t+'</span><div>'+x+'</div></div>'}
+ g.innerHTML=item("t-ok","Completed",done)+item("t-next","Ready next",next)+item("t-pend","Pending",pend)+item("t-att","Attention",att.join(" "));
+}
+var TAB="1";
+function fmt(n){return Number(n).toLocaleString("en-US")}
+function gby(arr,key){var m={},o=[];arr.forEach(function(r){var k=r[key];if(!m[k]){m[k]={k:k,n:0,tx:0};o.push(m[k])}m[k].n++;m[k].tx+=r.tx});return o.sort(function(a,b){return b.tx-a.tx||b.n-a.n||(a.k>b.k?1:-1)})}
+function woCls(s){if(s==="Not set")return"p-idle";if(/reject|cancel|block|overdue|fail|lost/i.test(s))return"p-bad";if(/complet|done|sign|approv|accept|active|live|clos|deliver|issued/i.test(s))return"p-ok";if(/pend|wait|hold|progress|draft|review|open|process|submit|raised|not /i.test(s))return"p-warn";return"p-wip"}
+function brows(list,color,sel){var max=Math.max.apply(null,list.map(function(x){return x.tx}).concat([1]));
+ return list.map(function(x){return '<div class="brow"><div class="l" title="'+esc(x.k)+'"><span'+(sel&&x.k===sel?' style="font-weight:700"':'')+'>'+esc(x.k)+'</span><small>'+x.n+(x.n==1?' entity':' entities')+'</small></div><div class="track"><i style="width:'+x.tx/max*100+'%;background:'+color+'"></i></div><b>'+fmt(x.tx)+'</b></div>'}).join("")||'<div class="mu">No data</div>'}
+function sumTable(list,head,sel,withTx){var n=0,t=0;
+ var rows=list.map(function(x){n+=x.n;t+=x.tx;return '<tr><td'+(sel&&x.k===sel?' style="font-weight:700"':'')+'>'+esc(x.k)+'</td><td class="r">'+x.n+'</td>'+(withTx?'<td class="r">'+fmt(x.tx)+'</td>':'')+'</tr>'}).join("");
+ return '<table><thead><tr><th>'+head+'</th><th class="r">Entities</th>'+(withTx?'<th class="r">Transactions</th>':'')+'</tr></thead><tbody>'+(rows||'<tr><td colspan="3" class="mu">No data</td></tr>')+'<tr class="tot"><td>Total</td><td class="r">'+n+'</td>'+(withTx?'<td class="r">'+fmt(t)+'</td>':'')+'</tr></tbody></table>'}
+function fillSel(id,first,vals){var s=$(id),cur=s.value;s.innerHTML='<option value="">'+first+'</option>'+vals.map(function(v){return '<option>'+esc(v)+'</option>'}).join("");s.value=vals.indexOf(cur)>=0?cur:""}
+function renderTx(){
+ var N=A.length,tot=A.reduce(function(a,r){return a+r.tx},0);
+ var miss=[];if(!EXTRA.tx)miss.push("Transaction Count");if(!EXTRA.asp)miss.push("ASP Provider");if(!EXTRA.wo)miss.push("WO Status");
+ $("xnote").textContent=miss.length?"Column not found in the sheet: "+miss.join(", ")+".":"";
+ var asp=gby(A,"asp"),wo=gby(A,"wo"),grp=gby(ALL,"g");
+ var noAsp=A.filter(function(r){return r.asp==="Not assigned"}).length,woSet=A.filter(function(r){return r.wo!=="Not set"}).length;
+ var woTop=wo.filter(function(x){return x.k!=="Not set"}).sort(function(a,b){return b.n-a.n}).slice(0,2).map(function(x){return esc(x.k)+": "+x.n}).join(" · ");
+ function rk(k){return /samsotech/i.test(k)?0:/^sq/i.test(k)?1:2}
+ var named=asp.filter(function(x){return x.k!=="Not assigned"}).sort(function(a,b){return rk(a.k)-rk(b.k)||b.tx-a.tx});
+ function tile(n,sfx,t,sub){return '<div class="tile"><div class="n">'+n+(sfx?'<span> '+sfx+'</span>':'')+'</div><div class="t">'+t+'</div>'+(sub?'<div class="ph mu" style="font-weight:500">'+sub+'</div>':'')+'</div>'}
+ var aspSub=named.map(function(x){return x.n+" assigned "+esc(x.k)}).join(" · ")+(noAsp?(named.length?" · ":"")+noAsp+" not assigned":"");
+ $("xtiles").innerHTML=tile(fmt(tot),"","Total transactions","Across "+N+(N==1?" entity":" entities"))+tile(N,N==1?"entity":"entities","ASP provider status",aspSub||"No ASP provider recorded")+tile(woSet,"of "+N,"Entities with a WO status",woTop||"No WO status recorded");
+ $("xgrp").innerHTML=sumTable(grp,"Group",GSEL,true)+(GSEL?'<div class="legend">Showing all groups for comparison; the selected group is in bold.</div>':'');
+ $("xasp").innerHTML=sumTable(asp,"ASP provider",null,true);
+ $("xwo").innerHTML='<table><thead><tr><th>WO status</th><th class="r">Entities</th><th class="r">Transactions</th></tr></thead><tbody>'+wo.map(function(x){return '<tr><td><span class="pill '+woCls(x.k)+'">'+esc(x.k)+'</span></td><td class="r">'+x.n+'</td><td class="r">'+fmt(x.tx)+'</td></tr>'}).join("")+'<tr class="tot"><td>Total</td><td class="r">'+N+'</td><td class="r">'+fmt(tot)+'</td></tr></tbody></table>';
+ var ws=wo.slice().sort(function(a,b){return b.n-a.n}).map(function(x){return x.k});
+ $("xmat").innerHTML=sumTable(asp,"ASP provider",null,false);
+ fillSel("xf1","All ASP providers",asp.map(function(x){return x.k}));
+ fillSel("xf2","All WO statuses",ws);
+ fillSel("xf3","All groups",gby(A,"g").map(function(x){return x.k}).sort());
+ var q=$("xq").value.toLowerCase(),f1=$("xf1").value,f2=$("xf2").value,f3=$("xf3").value;
+ var L=A.filter(function(r){return(!q||r.n.toLowerCase().indexOf(q)>=0)&&(!f1||r.asp===f1)&&(!f2||r.wo===f2)&&(!f3||r.g===f3)}).sort(function(a,b){return b.tx-a.tx||(a.n>b.n?1:-1)});
+ $("xtb").innerHTML=L.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td><td>'+esc(r.g)+'</td><td>'+esc(r.asp)+'</td><td><span class="pill '+woCls(r.wo)+'">'+esc(r.wo)+'</span></td><td class="r">'+fmt(r.tx)+'</td><td>'+eye(r)+'</td></tr>'}).join("")||'<tr><td colspan="7">No entities match these filters.</td></tr>';
+ if(L.length)$("xtb").innerHTML+='<tr class="tot"><td></td><td>Total</td><td></td><td></td><td></td><td class="r">'+fmt(L.reduce(function(a,r){return a+r.tx},0))+'</td><td></td></tr>';
+}
+function eye(r){return '<button type="button" class="eye" data-x="'+r.x+'" aria-label="View details for '+esc(r.n)+'" title="View details"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button>'}
+function fld(l,v){return '<div class="fld"><div class="fl">'+l+'</div><div class="fv">'+(v===""?'<span class="mu">–</span>':v)+'</div></div>'}
+function cfld(l,v){return '<div class="fld"><div class="fl">'+l+'</div><div class="fv">'+(v===""?'<span class="mu">–</span>':'<span>'+esc(v)+'</span><button type="button" class="cpy" data-v="'+esc(v)+'" aria-label="Copy '+l+'">Copy</button>')+'</div></div>'}
+function openM(r){var f=r.f;$("mt").textContent=r.n;
+ $("mbody").innerHTML='<div class="mrow m7">'+fld("Entity name",esc(r.n))+fld("Group",esc(r.g))+fld("Transaction count",fmt(r.tx))+fld("Order status",'<span class="pill '+woCls(r.wo)+'">'+esc(r.wo)+'</span>')+fld("ASP provider",esc(r.asp))+fld("Source system",esc(f.src))+fld("Version",esc(f.ver))+'</div>'+
+  '<div class="mrow m4">'+fld("DOF name",esc(f.dn))+fld("DOF email",esc(f.de))+fld("IT email",esc(f.ie))+fld("Phone",esc(f.ph))+'</div>'+
+  '<div class="mrow m3">'+cfld("TRN",f.trn)+cfld("TIN",f.tin)+fld("Implementation phase",esc(r.ph))+'</div>';
+ $("modal").style.display="flex";$("mclose").focus()}
+function closeM(){$("modal").style.display="none"}
+function fbCopy(t,done){var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(x){}document.body.removeChild(a)}
+function copyText(t,btn){var done=function(){btn.textContent="Copied ✓";btn.classList.add("ok");setTimeout(function(){btn.textContent="Copy";btn.classList.remove("ok")},1500)};
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){fbCopy(t,done)})}else fbCopy(t,done)}
+function renderAll(){A=GSEL?ALL.filter(function(r){return r.g===GSEL}):ALL.slice();renderBar();renderTop();renderStatus();renderTable();renderTx()}
 
 function setLive(ok,msg){var l=document.getElementById("live");l.className="live"+(ok?"":" off");document.getElementById("livetxt").textContent=msg;
  var b=document.getElementById("banner");
- if(ok){b.style.display="none"}else{b.style.display="block";b.textContent="Live connection to the Google Sheet is unavailable, so this page is showing a saved snapshot from 27 October 2026. In Google Sheets, set sharing to “Anyone with the link – Viewer”, then press Refresh now. ("+msg+")"}}
+ if(ok){b.style.display="none"}else{b.style.display="block";b.textContent="Could not load the latest data, so the figures shown may be out of date. Press Refresh now to try again. ("+msg+")"}}
+var TOKEN="",USER="",CHG="";
+try{TOKEN=sessionStorage.getItem("eiv_t")||"";USER=sessionStorage.getItem("eiv_u")||""}catch(x){}
+function keep(){try{sessionStorage.setItem("eiv_t",TOKEN);sessionStorage.setItem("eiv_u",USER)}catch(x){}}
+function drop(){TOKEN="";USER="";try{sessionStorage.removeItem("eiv_t");sessionStorage.removeItem("eiv_u")}catch(x){}}
+function $(id){return document.getElementById(id)}
+function api(b){
+ if(!CFG.API_URL||CFG.API_URL.indexOf("http")!==0)return Promise.reject(new Error("API_URL is not set in index.html"));
+ return fetch(CFG.API_URL,{method:"POST",body:JSON.stringify(b),redirect:"follow"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+function showAuth(view,msg){$("auth").style.display="flex";$("fLogin").style.display=view==="login"?"block":"none";$("fChange").style.display=view==="change"?"block":"none";$("amsg").textContent=msg||""}
+function hideAuth(){$("auth").style.display="none";$("who").textContent=USER}
+function busy(id,on,t){var b=$(id);b.disabled=on;if(t)b.textContent=on?"Please wait…":t}
+function enter(r){TOKEN=r.t;USER=r.u;keep();$("lp").value="";$("np").value="";$("np2").value="";hideAuth();load()}
+$("fLogin").addEventListener("submit",function(e){e.preventDefault();$("amsg").textContent="";busy("bLogin",true,"Sign in");
+ api({a:"login",u:$("lu").value,p:$("lp").value}).then(function(r){busy("bLogin",false,"Sign in");
+  if(r.status==="ok")enter(r);
+  else if(r.status==="change"){CHG=r.k;$("lp").value="";showAuth("change","")}
+  else $("amsg").textContent=r.err==="locked"?"Too many failed attempts. Please try again in 15 minutes.":(r.err==="server"?"Server error: "+(r.msg||""):"Invalid username or password.")})
+ .catch(function(x){busy("bLogin",false,"Sign in");$("amsg").textContent="Could not reach the server. "+x.message})});
+$("fChange").addEventListener("submit",function(e){e.preventDefault();var a=$("np").value,b=$("np2").value;
+ if(a!==b){$("amsg").textContent="The two passwords do not match.";return}
+ $("amsg").textContent="";busy("bChange",true,"Save password and continue");
+ api({a:"change",k:CHG,np:a}).then(function(r){busy("bChange",false,"Save password and continue");
+  if(r.status==="ok")enter(r);
+  else if(r.err==="policy")$("amsg").textContent=r.msg;
+  else if(r.err==="expired"){showAuth("login","Your temporary sign-in expired. Please sign in again.")}
+  else $("amsg").textContent="Could not save the password. "+(r.msg||"Please sign in again.")})
+ .catch(function(x){busy("bChange",false,"Save password and continue");$("amsg").textContent="Could not reach the server. "+x.message})});
+$("lo").addEventListener("click",function(){var t=TOKEN;drop();api({a:"logout",t:t}).catch(function(){}).then(function(){location.reload()})});
 function load(){
- var url=CFG.CSV_URL||("https://docs.google.com/spreadsheets/d/"+CFG.SHEET_ID+"/gviz/tq?tqx=out:csv&headers=0&sheet="+encodeURIComponent(CFG.SHEET_NAME));
- url+=(url.indexOf("?")<0?"?":"&")+"_="+Date.now();
- return fetch(url,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.text()})
- .then(function(t){if(/^\s*<(!doctype|html)/i.test(t))throw new Error("Sheet is not publicly viewable");ALL=fromRows(parseCSV(t));renderAll();
-  var d=new Date();document.getElementById("when").textContent=d.toLocaleString([], {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+ if(!TOKEN){showAuth("login");return Promise.resolve()}
+ return api({a:"data",t:TOKEN}).then(function(r){
+  if(r.err==="auth"){drop();showAuth("login","Your session has expired. Please sign in again.");return}
+  if(r.err)throw new Error(r.msg||r.err);
+  ALL=fromRows(r.rows);hideAuth();renderAll();
+  var d=new Date();$("when").textContent=d.toLocaleString([], {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
   setLive(true,"Live · auto-refresh every "+CFG.REFRESH_SEC+"s")})
- .catch(function(e){document.getElementById("when").textContent="Snapshot (offline)";setLive(false,e.message||"error");renderAll()})}
+ .catch(function(e){$("when").textContent="Not connected";setLive(false,e.message||"error");if(ALL.length){hideAuth();renderAll()}else{$("hl").textContent="Unable to load the dashboard data.";$("hp").textContent="Press Refresh now to try again."}})}
+document.addEventListener("click",function(e){var t=e.target,b=t.closest&&t.closest(".eye");
+ if(b){var r=ALL[+b.getAttribute("data-x")];if(r)openM(r);return}
+ var c=t.closest&&t.closest(".cpy");if(c){copyText(c.getAttribute("data-v"),c);return}
+ if(t.id==="modal"||(t.closest&&t.closest("#mclose")))closeM()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeM()});
+["xq","xf1","xf2","xf3"].forEach(function(id){$(id).addEventListener("input",renderTx)});
+$("tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;TAB=b.getAttribute("data-v");Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){x.className="tab"+(x===b?" on":"")});$("v1").style.display=TAB==="1"?"block":"none";$("v2").style.display=TAB==="2"?"block":"none"});
 ["q","ph","st"].forEach(function(id){document.getElementById(id).addEventListener("input",renderTable)});
 document.getElementById("rf").addEventListener("click",load);
 document.getElementById("gbar").addEventListener("change",function(e){if(e.target.id!=="gsel")return;GSEL=e.target.value;renderAll()});
 document.addEventListener("visibilitychange",function(){if(!document.hidden)load()});
-renderAll();load();setInterval(load,CFG.REFRESH_SEC*1000);
+load();setInterval(function(){if(TOKEN)load()},CFG.REFRESH_SEC*1000);
 </script>
 </body>
 </html>
