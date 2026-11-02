@@ -95,7 +95,7 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 .tot td{font-weight:700;border-top:2px solid var(--line)}
 .toprow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 .toprow .tabs{margin:0}.toprow .gbar{margin:0 0 0 auto;padding:6px 12px}
-.eye{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--brand);cursor:pointer;padding:0}.eye:hover{background:var(--brand-soft)}
+.eye,.edt{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--brand);cursor:pointer;padding:0}.eye:hover,.edt:hover{background:var(--brand-soft)}
 .modal{position:fixed;inset:0;z-index:80;background:rgba(10,17,25,.6);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
 .mcard{background:var(--surface);color:var(--ink);border-radius:14px;width:100%;max-width:1100px;max-height:92vh;overflow:auto;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
 .mhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.mhead h2{margin:0;font-size:18px}
@@ -114,6 +114,7 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 .uact{display:flex;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap}
 .btnp{font:inherit;font-weight:700;padding:9px 22px;border:0;border-radius:8px;background:var(--brand);color:var(--surface);cursor:pointer}.btnp:disabled{opacity:.5;cursor:not-allowed}
 .btns{font:inherit;font-weight:600;padding:9px 16px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer}
+#uTop.ok{color:var(--green)}.uhead{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
 #uMsg{font-size:13px}#uMsg.err{color:var(--red)}#uMsg.ok{color:var(--green)}
 .sthead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:14px}.sthead h2{margin:0}.sthead span{font-size:12px;color:var(--mute)}.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px 40px}.si{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;line-height:1.55}.tg{flex:0 0 92px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 0;border-radius:5px;text-transform:uppercase;margin-top:1px}.t-ok{background:rgba(35,122,59,.16);color:var(--green)}.t-next{background:var(--brand-soft);color:var(--brand)}.t-pend{background:var(--warn-soft);color:var(--warn)}.t-att{background:rgba(179,52,31,.15);color:var(--red)}.mu{color:var(--mute)}
 @media (max-width:860px){.summary,.grid2,.stgrid{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:21px}}
@@ -177,10 +178,17 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 <div id="v4" style="display:none">
 <section class="card"><div class="sthead"><h2>Update data</h2><span>Changes are written to the Google Sheet and recorded in the change log. Records cannot be deleted here.</span></div>
 <div class="seg"><button type="button" class="segb on" id="mUpd">Update existing entity</button><button type="button" class="segb" id="mAdd">Add new entity</button></div>
-<div id="uPickRow" class="tools" style="margin-top:12px"><input id="uPick" list="uList" placeholder="Type or choose the entity to update" autocomplete="off" aria-label="Entity to update"><datalist id="uList"></datalist></div>
+<div id="uTop" role="status" style="margin-top:12px;font-size:13px"></div>
+<div id="uListWrap">
+<div class="tools" style="margin-top:12px"><input id="uq" type="search" placeholder="Search entity" aria-label="Search entity"><select id="ug" aria-label="Filter by group"></select></div>
+<div class="tw"><table><thead><tr><th>#</th><th>Entity name</th><th>Group</th><th>Phase</th><th>ASP provider</th><th>WO status</th><th class="r">Transaction count</th><th class="r">Overage rate</th><th>Source system</th><th>Edit</th></tr></thead><tbody id="utb"></tbody></table></div>
+</div>
+<div id="uFormWrap" style="display:none">
+<div class="uhead"><button type="button" id="uBack" class="btns">← Back to list</button><strong id="uFormTitle"></strong></div>
 <div id="uNote" class="legend" style="display:none">The serial number is generated automatically.</div>
 <div id="uForm"></div>
-<div class="uact" id="uAct" style="display:none"><button type="button" id="uSave" class="btnp" disabled>Save changes</button><button type="button" id="uReset" class="btns">Reset</button><span id="uMsg" role="status"></span></div>
+<div class="uact" id="uAct"><button type="button" id="uSave" class="btnp" disabled>Save changes</button><button type="button" id="uReset" class="btns">Reset</button><span id="uMsg" role="status"></span></div>
+</div>
 </section>
 </div>
 </main></div>
@@ -365,7 +373,7 @@ function renderSrc(){
 }
 var ROLE="Viewer",DV={},UMODE="upd",UCUR=null;
 function fmtr(r){return r.raw.ov===""?'<span class="mu">–</span>':Number(r.ov).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})}
-var FSEC=[["Entity",["n","g","pp"]],["Order details",["asp","wo","tx","ov"]],["Source system",["src","ver"]],["Contacts and tax",["dn","de","ie","ph","trn","tin"]],["Implementation stages",["s0","s1","s2","s3","s4","s5","s6"]]];
+var FSEC=[["Entity",["n","g","pp"]],["Order details",["asp","wo","tx","ov"]],["Source system",["src","ver"]],["Contacts",["dn","de","ie","ph"]],["Tax details",["trn","tin"]],["Implementation stages",["s0","s1","s2","s3","s4","s5","s6"]]];
 var FLB={n:"Entity name",g:"Group",pp:"Implementation phase",asp:"ASP provider",wo:"WO status",tx:"Transaction count",ov:"Overage rate per transaction",src:"Source system (select one or more)",ver:"Version",dn:"DOF name",de:"DOF email",ie:"IT email",ph:"Phone",trn:"TRN",tin:"TIN",s0:"Project kick-off",s1:"EmaraTax onboard",s2:"Gap assessment",s3:"Source system configuration",s4:"ASP onboarding",s5:"Testing (UAT)",s6:"Go-live (PROD)"};
 var FTYPE={n:"text",g:"list",pp:"list",asp:"list",wo:"list",tx:"num",ov:"num",src:"multi",ver:"text",dn:"text",de:"text",ie:"text",ph:"text",trn:"text",tin:"text",s0:"stage",s1:"stage",s2:"stage",s3:"stage",s4:"stage",s5:"stage",s6:"stage"};
 function optsFor(id){
@@ -395,28 +403,35 @@ function same(id,a,b){a=String(a||"").trim();b=String(b||"").trim();if(a===b)ret
 function collect(){var ch={},bf={};Object.keys(FLB).forEach(function(id){var nv=getVal(id),ov=UCUR.raw[id]||"";if(!same(id,nv,ov)){ch[id]=nv;bf[id]=ov}});return{ch:ch,bf:bf}}
 function umsg(t,c){var m=$("uMsg");m.textContent=t||"";m.className=c||""}
 function dirty(){$("uSave").disabled=UMODE==="add"?!getVal("n"):(!UCUR||!Object.keys(collect().ch).length)}
-function pickEnt(){var nm=$("uPick").value.trim().toLowerCase();UCUR=null;
- for(var i=0;i<ALL.length;i++)if(ALL[i].n.toLowerCase()===nm){UCUR=ALL[i];break}
- $("uForm").innerHTML=UCUR?formHtml(UCUR.raw):"";$("uAct").style.display=UCUR?"flex":"none";umsg("");dirty()}
-function setMode(m){UMODE=m;UCUR=null;$("mUpd").className="segb"+(m==="upd"?" on":"");$("mAdd").className="segb"+(m==="add"?" on":"");
- $("uPickRow").style.display=m==="upd"?"flex":"none";$("uNote").style.display=m==="add"?"block":"none";$("uPick").value="";
- $("uForm").innerHTML=m==="add"?formHtml({}):"";$("uAct").style.display=m==="add"?"flex":"none";$("uSave").textContent=m==="add"?"Add entity":"Save changes";umsg("");dirty()}
+function setMode(m){UMODE=m;UCUR=null;$("mUpd").className="segb"+(m==="upd"?" on":"");$("mAdd").className="segb"+(m==="add"?" on":"");umsg("");$("uTop").textContent="";
+ if(m==="add"){$("uListWrap").style.display="none";$("uFormWrap").style.display="block";$("uBack").style.display="none";$("uNote").style.display="block";$("uFormTitle").textContent="New entity";$("uForm").innerHTML=formHtml({});$("uSave").textContent="Add entity"}
+ else{$("uFormWrap").style.display="none";$("uListWrap").style.display="block";$("uForm").innerHTML="";$("uSave").textContent="Save changes";renderUList()}
+ dirty()}
+function openEdit(x){var r=ALL[x];if(!r)return;UCUR=r;UMODE="upd";$("uTop").textContent="";$("uListWrap").style.display="none";$("uFormWrap").style.display="block";$("uBack").style.display="";$("uNote").style.display="none";
+ $("uFormTitle").textContent="Editing: "+r.n;$("uForm").innerHTML=formHtml(r.raw);$("uSave").textContent="Save changes";umsg("");dirty();if(window.scrollTo)window.scrollTo(0,0)}
+function backToList(){UCUR=null;$("uFormWrap").style.display="none";$("uListWrap").style.display="block";$("uForm").innerHTML="";umsg("");renderUList()}
+function renderUList(){var gs=[];ALL.forEach(function(r){if(gs.indexOf(r.g)<0)gs.push(r.g)});fillSel("ug","All groups",gs.sort());
+ var q=$("uq").value.toLowerCase(),g=$("ug").value;
+ var L=ALL.filter(function(r){return(!q||r.n.toLowerCase().indexOf(q)>=0)&&(!g||r.g===g)});
+ var pen='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+ $("utb").innerHTML=L.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td><td>'+esc(r.g)+'</td><td>'+esc(r.ph)+'</td><td>'+esc(r.asp)+'</td><td><span class="pill '+woCls(r.wo)+'">'+esc(r.wo)+'</span></td><td class="r">'+fmt(r.tx)+'</td><td class="r">'+fmtr(r)+'</td><td>'+(r.srcs.length?esc(r.srcs.join(", ")):'<span class="mu">–</span>')+'</td><td><button type="button" class="edt" data-x="'+r.x+'" aria-label="Edit '+esc(r.n)+'" title="Edit">'+pen+'</button></td></tr>'}).join("")||'<tr><td colspan="10">No entities match these filters.</td></tr>'}
 function saveU(){var b=$("uSave"),body;
  if(UMODE==="add"){var vals={};Object.keys(FLB).forEach(function(id){var v=getVal(id);if(v!=="")vals[id]=v});if(!vals.n){umsg("Entity name is required.","err");return}body={a:"save",t:TOKEN,mode:"add",values:vals}}
  else{if(!UCUR)return;var c=collect();if(!Object.keys(c.ch).length){umsg("No changes to save.","err");return}body={a:"save",t:TOKEN,mode:"update",rn:UCUR.rn,expect:UCUR.raw.n,changes:c.ch,before:c.bf}}
  b.disabled=true;umsg("Saving…","");
  api(body).then(function(r){
-  if(r.ok){var add=UMODE==="add",nm=add?body.values.n:(body.changes.n||UCUR.raw.n),ok=add?'Added "'+nm+'"'+(r.sl?" as serial number "+r.sl:"")+".":"Saved "+r.changed+(r.changed==1?" change.":" changes.");
-   return load().then(function(){if(add){$("uForm").innerHTML=formHtml({});dirty()}else{$("uPick").value=nm;pickEnt()}umsg(ok,"ok")})}
+  if(r.ok){var add=UMODE==="add",nm=add?body.values.n:(body.changes.n||UCUR.raw.n),ok=add?'Added "'+nm+'"'+(r.sl?" as serial number "+r.sl:"")+".":'Saved '+r.changed+(r.changed==1?" change":" changes")+' to "'+nm+'".';
+   return load().then(function(){if(add){$("uForm").innerHTML=formHtml({});dirty();umsg(ok,"ok")}else{backToList();var t=$("uTop");t.textContent=ok;t.className="ok"}})}
   b.disabled=false;
   if(r.err==="auth"){drop();showAuth("login","Your session has expired. Please sign in again.");return}
-  umsg(r.err==="forbidden"?"You do not have permission to edit data.":r.err==="conflict"?"This record was changed by someone else. Press Refresh now, select the entity again and retry.":r.err==="invalid"?(r.msg||"Some values are not valid."):"Could not save. "+(r.msg||r.err||""),"err")})
+  umsg(r.err==="forbidden"?"You do not have permission to edit data.":r.err==="conflict"?"This record was changed by someone else. Go back to the list, press Refresh now and edit it again.":r.err==="invalid"?(r.msg||"Some values are not valid."):"Could not save. "+(r.msg||r.err||""),"err")})
  .catch(function(x){b.disabled=false;umsg("Could not reach the server. "+x.message,"err")})}
 function applyRole(){var ed=ROLE==="Editor";$("tabUpd").style.display=ed?"":"none";
- $("uList").innerHTML=ALL.map(function(r){return r.n}).sort().map(function(n){return '<option value="'+esc(n)+'">'}).join("");
+ if(ed&&UMODE==="upd"&&$("uListWrap").style.display!=="none")renderUList();
  if(!ed&&TAB==="4")$("tabs").querySelector('[data-v="1"]').click()}
-function initUpd(){$("uPick").addEventListener("input",pickEnt);$("uForm").addEventListener("input",dirty);$("uForm").addEventListener("change",dirty);
- $("uSave").addEventListener("click",saveU);$("uReset").addEventListener("click",function(){if(UMODE==="add")setMode("add");else pickEnt()});
+function initUpd(){$("uq").addEventListener("input",renderUList);$("ug").addEventListener("change",renderUList);$("uBack").addEventListener("click",backToList);
+ $("uForm").addEventListener("input",dirty);$("uForm").addEventListener("change",dirty);
+ $("uSave").addEventListener("click",saveU);$("uReset").addEventListener("click",function(){if(UMODE==="add")setMode("add");else if(UCUR)openEdit(UCUR.x)});
  $("mUpd").addEventListener("click",function(){setMode("upd")});$("mAdd").addEventListener("click",function(){setMode("add")})}
 function renderAll(){A=GSEL?ALL.filter(function(r){return r.g===GSEL}):ALL.slice();renderBar();renderTop();renderStatus();renderSrc();renderTable();renderTx()}
 
@@ -460,7 +475,7 @@ function load(){
   var d=new Date();$("when").textContent=d.toLocaleString([], {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
   setLive(true,"Live · auto-refresh every "+CFG.REFRESH_SEC+"s")})
  .catch(function(e){$("when").textContent="Not connected";setLive(false,e.message||"error");if(ALL.length){hideAuth();renderAll()}else{$("hl").textContent="Unable to load the dashboard data.";$("hp").textContent="Press Refresh now to try again."}})}
-document.addEventListener("click",function(e){var t=e.target,b=t.closest&&t.closest(".eye");
+document.addEventListener("click",function(e){var t=e.target,ed=t.closest&&t.closest(".edt");if(ed){openEdit(+ed.getAttribute("data-x"));return}var b=t.closest&&t.closest(".eye");
  if(b){var r=ALL[+b.getAttribute("data-x")];if(r)openM(r);return}
  var c=t.closest&&t.closest(".cpy");if(c){copyText(c.getAttribute("data-v"),c);return}
  if(t.id==="modal"||(t.closest&&t.closest("#mclose")))closeM()});
