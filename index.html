@@ -105,6 +105,16 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 .fl{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin-bottom:3px}
 .fv{font-size:14px;font-weight:600;word-break:break-word;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .cpy{font:inherit;font-size:12px;font-weight:600;padding:2px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--brand);cursor:pointer}.cpy.ok{background:rgba(35,122,59,.16);color:var(--green);border-color:transparent}
+.seg{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+.segb{font:inherit;font-weight:600;padding:7px 16px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--mute);cursor:pointer}.segb.on{background:var(--brand-soft);color:var(--brand);border-color:var(--brand)}
+.fsec{margin-top:18px}.fsec h3{margin:0 0 10px;font-size:14px;color:var(--brand)}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 16px}
+.ff input[type=text],.ff select{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.chk{display:flex;flex-wrap:wrap;gap:8px 16px}.cb{display:inline-flex;align-items:center;gap:6px;font-size:13px}
+.uact{display:flex;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btnp{font:inherit;font-weight:700;padding:9px 22px;border:0;border-radius:8px;background:var(--brand);color:var(--surface);cursor:pointer}.btnp:disabled{opacity:.5;cursor:not-allowed}
+.btns{font:inherit;font-weight:600;padding:9px 16px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);cursor:pointer}
+#uMsg{font-size:13px}#uMsg.err{color:var(--red)}#uMsg.ok{color:var(--green)}
 .sthead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:14px}.sthead h2{margin:0}.sthead span{font-size:12px;color:var(--mute)}.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px 40px}.si{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;line-height:1.55}.tg{flex:0 0 92px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 0;border-radius:5px;text-transform:uppercase;margin-top:1px}.t-ok{background:rgba(35,122,59,.16);color:var(--green)}.t-next{background:var(--brand-soft);color:var(--brand)}.t-pend{background:var(--warn-soft);color:var(--warn)}.t-att{background:rgba(179,52,31,.15);color:var(--red)}.mu{color:var(--mute)}
 @media (max-width:860px){.summary,.grid2,.stgrid{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:21px}}
 @media print{header{background:#12233a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.tools,.stamp button{display:none}}
@@ -124,7 +134,7 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 </div></div></header>
 <div class="wrap"><main>
 <div id="banner"></div>
-<div class="toprow"><div class="tabs" id="tabs"><button type="button" class="tab on" data-v="1">Implementation Status</button><button type="button" class="tab" data-v="2">Order Summary</button><button type="button" class="tab" data-v="3">Source System Analysis</button></div>
+<div class="toprow"><div class="tabs" id="tabs"><button type="button" class="tab on" data-v="1">Implementation Status</button><button type="button" class="tab" data-v="2">Order Summary</button><button type="button" class="tab" data-v="3">Source System Analysis</button><button type="button" class="tab" id="tabUpd" data-v="4" style="display:none">Update Data</button></div>
 <div class="gbar" id="gbar"></div></div>
 <div id="v1">
 <section class="card summary">
@@ -151,7 +161,7 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 <section class="grid2"><div class="card"><h2>Work order (WO) status</h2><div class="tw" id="xwo"></div></div><div class="card"><h2>ASP provider</h2><div class="tw" id="xmat"></div></div></section>
 <section class="card"><h2>Transactions by entity</h2>
 <div class="tools"><input id="xq" type="search" placeholder="Search entity" aria-label="Search entity"><select id="xf1" aria-label="ASP provider"></select><select id="xf2" aria-label="WO status"></select><select id="xf3" aria-label="Group"></select></div>
-<div class="tw"><table class="xt"><thead><tr><th>#</th><th>Entity</th><th>Group</th><th>ASP provider</th><th>WO status</th><th class="r">Transactions</th><th></th></tr></thead><tbody id="xtb"></tbody></table></div>
+<div class="tw"><table class="xt"><thead><tr><th>#</th><th>Entity</th><th>Group</th><th>ASP provider</th><th>WO status</th><th class="r">Transactions</th><th class="r">Overage rate per transaction</th><th></th></tr></thead><tbody id="xtb"></tbody></table></div>
 </section>
 </div>
 <div id="v3" style="display:none">
@@ -162,6 +172,15 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 <section class="card" style="margin-bottom:14px"><h2>Entity vs source system</h2>
 <div class="tools"><input id="sfq" type="search" placeholder="Search entity" aria-label="Search entity"><select id="sf1" aria-label="Source system"></select><select id="sf2" aria-label="Configuration status"></select></div>
 <div class="tw"><table><thead><tr><th>#</th><th>Entity</th><th>Group</th><th>Source systems</th><th>Source system configuration</th><th></th></tr></thead><tbody id="stb"></tbody></table></div>
+</section>
+</div>
+<div id="v4" style="display:none">
+<section class="card"><div class="sthead"><h2>Update data</h2><span>Changes are written to the Google Sheet and recorded in the change log. Records cannot be deleted here.</span></div>
+<div class="seg"><button type="button" class="segb on" id="mUpd">Update existing entity</button><button type="button" class="segb" id="mAdd">Add new entity</button></div>
+<div id="uPickRow" class="tools" style="margin-top:12px"><input id="uPick" list="uList" placeholder="Type or choose the entity to update" autocomplete="off" aria-label="Entity to update"><datalist id="uList"></datalist></div>
+<div id="uNote" class="legend" style="display:none">The serial number is generated automatically.</div>
+<div id="uForm"></div>
+<div class="uact" id="uAct" style="display:none"><button type="button" id="uSave" class="btnp" disabled>Save changes</button><button type="button" id="uReset" class="btns">Reset</button><span id="uMsg" role="status"></span></div>
 </section>
 </div>
 </main></div>
@@ -189,6 +208,7 @@ function clean(v){return String(v||"").replace(/[\u200b]/g,"").trim()}
 function num(v){var n=parseFloat(String(v||"").replace(/[^0-9.\-]/g,""));return isNaN(n)?0:n}
 var EXTRA={asp:true,wo:true,tx:true};
 function splitSrc(s){var seen={},o=[];String(s||"").split(/[,;\n\r]+/).forEach(function(p){p=p.trim();if(p&&!seen[p.toLowerCase()]){seen[p.toLowerCase()]=1;o.push(p)}});return o}
+var FD=[["n",["property"]],["g",["group"]],["tx",["transactioncount"]],["ov",["overage"]],["wo",["wostatus"]],["asp",["aspprovider"]],["src",["sourcesystem"]],["ver",["version"]],["dn",["dofname"]],["de",["dofemail"]],["ie",["itemailid"]],["ph",["phone"]],["trn",["trn"]],["tin",["tin"]],["pp",["implementationphase"]],["s0",["projectkick"]],["s1",["emaratax"]],["s2",["gapassess"]],["s3",["sourcesystemconf"]],["s4",["sqportal","asponboard","aspportal"]],["s5",["testing"]],["s6",["go-live"]]];
 function has(r,j){return j>=0&&String(r[j]||"").replace(/[\u200b\s]/g,"")!==""}
 function fromRows(rows){
  var h=-1,i;for(i=0;i<rows.length;i++){if(rows[i].some(function(c){return norm(c)==="property"})){h=i;break}}
@@ -196,14 +216,17 @@ function fromRows(rows){
  var H=rows[h].map(norm);
  function col(k){var ks=[].concat(k);for(var q=0;q<ks.length;q++)for(var j=0;j<H.length;j++)if(H[j].indexOf(ks[q])>=0)return j;return -1}
  function cx(k){for(var j=0;j<H.length;j++)if(H[j]===k)return j;return col(k)}
+ function cxa(ks){for(var q=0;q<ks.length;q++){var j=H.indexOf(ks[q]);if(j>=0)return j}return col(ks)}
+ var FC={};FD.forEach(function(d){FC[d[0]]=cxa(d[1])});
+ function rawOf(r){var o={};FD.forEach(function(d){var c=FC[d[0]];o[d[0]]=c>=0?clean(r[c]):""});return o}
  var cf=["dofname","dofemail","itemailid","phone","trn","tin","sourcesystem","version"].map(function(k){return cx(k)});
  var cn=col("property"),cp=col("implementationphase"),cg=col("group"),cl=col("sl."),css=col("sourcesystem"),cv=col("version"),ct=col("trn"),cap=col("aspprovider"),cwo=col("wostatus"),ctc=col("transactioncount"),cs=KEYS.map(col);
  var lost=[];if(cn<0)lost.push("Property");cs.forEach(function(x,k){if(x<0)lost.push(S[k])});
  if(lost.length)throw new Error("Column header not found in the sheet: "+lost.join(", "));
  var out=[];
  for(i=h+1;i<rows.length;i++){var r=rows[i],n=String(r[cn]||"").replace(/[\u200b]/g,"").trim();if(!n)continue;
-  out.push({n:n,g:(cg>=0&&String(r[cg]||"").replace(/[\u200b]/g,"").trim())||"Ungrouped",i:String(r[cl]||"").replace(/[\u200b]/g,"").trim()||out.length+1,x:out.length,srcs:splitSrc(r[cf[6]]),f:{dn:clean(r[cf[0]]),de:clean(r[cf[1]]),ie:clean(r[cf[2]]),ph:clean(r[cf[3]]),trn:clean(r[cf[4]]),tin:clean(r[cf[5]]),src:clean(r[cf[6]]),ver:clean(r[cf[7]])},ss:has(r,css),asp:clean(cap>=0?r[cap]:"")||"Not assigned",wo:clean(cwo>=0?r[cwo]:"")||"Not set",tx:num(ctc>=0?r[ctc]:""),ver:has(r,cv),trn:has(r,ct),ph:(cp>=0&&String(r[cp]||"").replace(/[\u200b]/g,"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
- EXTRA={asp:cap>=0,wo:cwo>=0,tx:ctc>=0};
+  out.push({n:n,g:(cg>=0&&String(r[cg]||"").replace(/[\u200b]/g,"").trim())||"Ungrouped",i:String(r[cl]||"").replace(/[\u200b]/g,"").trim()||out.length+1,x:out.length,rn:i+1,raw:rawOf(r),ov:num(FC.ov>=0?r[FC.ov]:""),srcs:splitSrc(r[cf[6]]),f:{dn:clean(r[cf[0]]),de:clean(r[cf[1]]),ie:clean(r[cf[2]]),ph:clean(r[cf[3]]),trn:clean(r[cf[4]]),tin:clean(r[cf[5]]),src:clean(r[cf[6]]),ver:clean(r[cf[7]])},ss:has(r,css),asp:clean(cap>=0?r[cap]:"")||"Not assigned",wo:clean(cwo>=0?r[cwo]:"")||"Not set",tx:num(ctc>=0?r[ctc]:""),ver:has(r,cv),trn:has(r,ct),ph:(cp>=0&&String(r[cp]||"").replace(/[\u200b]/g,"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
+ EXTRA={asp:cap>=0,wo:cwo>=0,tx:ctc>=0,ov:FC.ov>=0};
  if(!out.length)throw new Error("No entity rows found");return out}
 
 function sc(r){return r.st.reduce(function(a,b){return a+b},0)}
@@ -285,7 +308,7 @@ function sumTable(list,head,sel,withTx){var n=0,t=0;
 function fillSel(id,first,vals){var s=$(id),cur=s.value;s.innerHTML='<option value="">'+first+'</option>'+vals.map(function(v){return '<option>'+esc(v)+'</option>'}).join("");s.value=vals.indexOf(cur)>=0?cur:""}
 function renderTx(){
  var N=A.length,tot=A.reduce(function(a,r){return a+r.tx},0);
- var miss=[];if(!EXTRA.tx)miss.push("Transaction Count");if(!EXTRA.asp)miss.push("ASP Provider");if(!EXTRA.wo)miss.push("WO Status");
+ var miss=[];if(!EXTRA.tx)miss.push("Transaction Count");if(!EXTRA.asp)miss.push("ASP Provider");if(!EXTRA.wo)miss.push("WO Status");if(!EXTRA.ov)miss.push("Overage Rate per transaction");
  $("xnote").textContent=miss.length?"Column not found in the sheet: "+miss.join(", ")+".":"";
  var asp=gby(A,"asp"),wo=gby(A,"wo"),grp=gby(ALL,"g");
  var noAsp=A.filter(function(r){return r.asp==="Not assigned"}).length,woSet=A.filter(function(r){return r.wo!=="Not set"}).length;
@@ -305,8 +328,8 @@ function renderTx(){
  fillSel("xf3","All groups",gby(A,"g").map(function(x){return x.k}).sort());
  var q=$("xq").value.toLowerCase(),f1=$("xf1").value,f2=$("xf2").value,f3=$("xf3").value;
  var L=A.filter(function(r){return(!q||r.n.toLowerCase().indexOf(q)>=0)&&(!f1||r.asp===f1)&&(!f2||r.wo===f2)&&(!f3||r.g===f3)}).sort(function(a,b){return b.tx-a.tx||(a.n>b.n?1:-1)});
- $("xtb").innerHTML=L.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td><td>'+esc(r.g)+'</td><td>'+esc(r.asp)+'</td><td><span class="pill '+woCls(r.wo)+'">'+esc(r.wo)+'</span></td><td class="r">'+fmt(r.tx)+'</td><td>'+eye(r)+'</td></tr>'}).join("")||'<tr><td colspan="7">No entities match these filters.</td></tr>';
- if(L.length)$("xtb").innerHTML+='<tr class="tot"><td></td><td>Total</td><td></td><td></td><td></td><td class="r">'+fmt(L.reduce(function(a,r){return a+r.tx},0))+'</td><td></td></tr>';
+ $("xtb").innerHTML=L.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td><td>'+esc(r.g)+'</td><td>'+esc(r.asp)+'</td><td><span class="pill '+woCls(r.wo)+'">'+esc(r.wo)+'</span></td><td class="r">'+fmt(r.tx)+'</td><td class="r">'+fmtr(r)+'</td><td>'+eye(r)+'</td></tr>'}).join("")||'<tr><td colspan="8">No entities match these filters.</td></tr>';
+ if(L.length)$("xtb").innerHTML+='<tr class="tot"><td></td><td>Total</td><td></td><td></td><td></td><td class="r">'+fmt(L.reduce(function(a,r){return a+r.tx},0))+'</td><td></td><td></td></tr>';
 }
 function eye(r){return '<button type="button" class="eye" data-x="'+r.x+'" aria-label="View details for '+esc(r.n)+'" title="View details"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button>'}
 function fld(l,v){return '<div class="fld"><div class="fl">'+l+'</div><div class="fv">'+(v===""?'<span class="mu">–</span>':v)+'</div></div>'}
@@ -340,6 +363,61 @@ function renderSrc(){
  var L=A.filter(function(r){var c=r.st[3]?"Completed":"Pending";return(!q||r.n.toLowerCase().indexOf(q)>=0)&&(!f1||sv(r).indexOf(f1)>=0)&&(!f2||c===f2)}).sort(function(a,b){var x=sv(a).join(", "),y=sv(b).join(", ");return x===y?(a.n>b.n?1:-1):(x>y?1:-1)});
  $("stb").innerHTML=L.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td><td>'+esc(r.g)+'</td><td>'+esc(sv(r).join(", "))+'</td><td><span class="pill '+(r.st[3]?'p-ok':'p-warn')+'">'+(r.st[3]?'Completed':'Pending')+'</span></td><td>'+eye(r)+'</td></tr>'}).join("")||'<tr><td colspan="6">No entities match these filters.</td></tr>';
 }
+var ROLE="Viewer",DV={},UMODE="upd",UCUR=null;
+function fmtr(r){return r.raw.ov===""?'<span class="mu">–</span>':Number(r.ov).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})}
+var FSEC=[["Entity",["n","g","pp"]],["Order details",["asp","wo","tx","ov"]],["Source system",["src","ver"]],["Contacts and tax",["dn","de","ie","ph","trn","tin"]],["Implementation stages",["s0","s1","s2","s3","s4","s5","s6"]]];
+var FLB={n:"Entity name",g:"Group",pp:"Implementation phase",asp:"ASP provider",wo:"WO status",tx:"Transaction count",ov:"Overage rate per transaction",src:"Source system (select one or more)",ver:"Version",dn:"DOF name",de:"DOF email",ie:"IT email",ph:"Phone",trn:"TRN",tin:"TIN",s0:"Project kick-off",s1:"EmaraTax onboard",s2:"Gap assessment",s3:"Source system configuration",s4:"ASP onboarding",s5:"Testing (UAT)",s6:"Go-live (PROD)"};
+var FTYPE={n:"text",g:"list",pp:"list",asp:"list",wo:"list",tx:"num",ov:"num",src:"multi",ver:"text",dn:"text",de:"text",ie:"text",ph:"text",trn:"text",tin:"text",s0:"stage",s1:"stage",s2:"stage",s3:"stage",s4:"stage",s5:"stage",s6:"stage"};
+function optsFor(id){
+ if(DV[id]&&DV[id].length)return{list:DV[id],strict:true};
+ if(FTYPE[id]==="stage")return{list:["Completed"],strict:true};
+ var set={},o=[];ALL.forEach(function(r){(id==="src"?r.srcs:[r.raw[id]]).forEach(function(v){if(v&&!set[v.toLowerCase()]){set[v.toLowerCase()]=1;o.push(v)}})});
+ o.sort();return{list:o,strict:false}}
+function ctl(id,val){var o=optsFor(id),nid="u_"+id,t=FTYPE[id],list,low=String(val).toLowerCase();
+ if(t==="multi"){var cur=splitSrc(val),cl=cur.map(function(x){return x.toLowerCase()});list=o.list.slice();
+  cur.forEach(function(c){if(!list.some(function(l){return l.toLowerCase()===c.toLowerCase()}))list.push(c)});
+  return '<div class="chk" id="'+nid+'">'+(list.map(function(v){return '<label class="cb"><input type="checkbox" value="'+esc(v)+'"'+(cl.indexOf(v.toLowerCase())>=0?' checked':'')+'> '+esc(v)+'</label>'}).join("")||'<span class="mu">No options found</span>')+'</div>'+(o.strict?'':'<input type="text" id="'+nid+'x" placeholder="Add other systems (comma separated)" style="margin-top:8px">')}
+ if(t==="list"||t==="stage"){
+  if(o.strict){list=o.list.slice();if(val&&!list.some(function(l){return l.toLowerCase()===low}))list.push(val);
+   return '<select id="'+nid+'"><option value="">—</option>'+list.map(function(v){return '<option'+(v.toLowerCase()===low?' selected':'')+'>'+esc(v)+'</option>'}).join("")+'</select>'}
+  return '<input type="text" id="'+nid+'" list="dl_'+id+'" value="'+esc(val)+'" autocomplete="off"><datalist id="dl_'+id+'">'+o.list.map(function(v){return '<option value="'+esc(v)+'">'}).join("")+'</datalist>'}
+ if(t==="num")return '<input type="text" inputmode="decimal" id="'+nid+'" value="'+esc(val)+'">';
+ return '<input type="text" id="'+nid+'" value="'+esc(val)+'">'}
+function formHtml(raw){return FSEC.map(function(s){return '<div class="fsec"><h3>'+s[0]+'</h3><div class="fg">'+s[1].map(function(id){return '<div class="ff"'+(id==="src"?' style="grid-column:1/-1"':'')+'><div class="fl">'+FLB[id]+'</div>'+ctl(id,raw[id]||"")+'</div>'}).join("")+'</div></div>'}).join("")}
+function getVal(id){
+ if(FTYPE[id]==="multi"){var box=$("u_src"),o=[];if(box)Array.prototype.forEach.call(box.querySelectorAll("input:checked"),function(c){o.push(c.value)});var x=$("u_srcx");if(x&&x.value)o=o.concat(splitSrc(x.value));return splitSrc(o.join(", ")).join(", ")}
+ var e=$("u_"+id);return e?String(e.value).trim():""}
+function same(id,a,b){a=String(a||"").trim();b=String(b||"").trim();if(a===b)return true;var t=FTYPE[id];
+ if(t==="num")return a!==""&&b!==""&&num(a)===num(b);
+ if(t==="multi"){var f=function(s){return splitSrc(s).map(function(x){return x.toLowerCase()}).sort().join("|")};return f(a)===f(b)}
+ if(t==="list"||t==="stage")return a.toLowerCase()===b.toLowerCase();
+ return false}
+function collect(){var ch={},bf={};Object.keys(FLB).forEach(function(id){var nv=getVal(id),ov=UCUR.raw[id]||"";if(!same(id,nv,ov)){ch[id]=nv;bf[id]=ov}});return{ch:ch,bf:bf}}
+function umsg(t,c){var m=$("uMsg");m.textContent=t||"";m.className=c||""}
+function dirty(){$("uSave").disabled=UMODE==="add"?!getVal("n"):(!UCUR||!Object.keys(collect().ch).length)}
+function pickEnt(){var nm=$("uPick").value.trim().toLowerCase();UCUR=null;
+ for(var i=0;i<ALL.length;i++)if(ALL[i].n.toLowerCase()===nm){UCUR=ALL[i];break}
+ $("uForm").innerHTML=UCUR?formHtml(UCUR.raw):"";$("uAct").style.display=UCUR?"flex":"none";umsg("");dirty()}
+function setMode(m){UMODE=m;UCUR=null;$("mUpd").className="segb"+(m==="upd"?" on":"");$("mAdd").className="segb"+(m==="add"?" on":"");
+ $("uPickRow").style.display=m==="upd"?"flex":"none";$("uNote").style.display=m==="add"?"block":"none";$("uPick").value="";
+ $("uForm").innerHTML=m==="add"?formHtml({}):"";$("uAct").style.display=m==="add"?"flex":"none";$("uSave").textContent=m==="add"?"Add entity":"Save changes";umsg("");dirty()}
+function saveU(){var b=$("uSave"),body;
+ if(UMODE==="add"){var vals={};Object.keys(FLB).forEach(function(id){var v=getVal(id);if(v!=="")vals[id]=v});if(!vals.n){umsg("Entity name is required.","err");return}body={a:"save",t:TOKEN,mode:"add",values:vals}}
+ else{if(!UCUR)return;var c=collect();if(!Object.keys(c.ch).length){umsg("No changes to save.","err");return}body={a:"save",t:TOKEN,mode:"update",rn:UCUR.rn,expect:UCUR.raw.n,changes:c.ch,before:c.bf}}
+ b.disabled=true;umsg("Saving…","");
+ api(body).then(function(r){
+  if(r.ok){var add=UMODE==="add",nm=add?body.values.n:(body.changes.n||UCUR.raw.n),ok=add?'Added "'+nm+'"'+(r.sl?" as serial number "+r.sl:"")+".":"Saved "+r.changed+(r.changed==1?" change.":" changes.");
+   return load().then(function(){if(add){$("uForm").innerHTML=formHtml({});dirty()}else{$("uPick").value=nm;pickEnt()}umsg(ok,"ok")})}
+  b.disabled=false;
+  if(r.err==="auth"){drop();showAuth("login","Your session has expired. Please sign in again.");return}
+  umsg(r.err==="forbidden"?"You do not have permission to edit data.":r.err==="conflict"?"This record was changed by someone else. Press Refresh now, select the entity again and retry.":r.err==="invalid"?(r.msg||"Some values are not valid."):"Could not save. "+(r.msg||r.err||""),"err")})
+ .catch(function(x){b.disabled=false;umsg("Could not reach the server. "+x.message,"err")})}
+function applyRole(){var ed=ROLE==="Editor";$("tabUpd").style.display=ed?"":"none";
+ $("uList").innerHTML=ALL.map(function(r){return r.n}).sort().map(function(n){return '<option value="'+esc(n)+'">'}).join("");
+ if(!ed&&TAB==="4")$("tabs").querySelector('[data-v="1"]').click()}
+function initUpd(){$("uPick").addEventListener("input",pickEnt);$("uForm").addEventListener("input",dirty);$("uForm").addEventListener("change",dirty);
+ $("uSave").addEventListener("click",saveU);$("uReset").addEventListener("click",function(){if(UMODE==="add")setMode("add");else pickEnt()});
+ $("mUpd").addEventListener("click",function(){setMode("upd")});$("mAdd").addEventListener("click",function(){setMode("add")})}
 function renderAll(){A=GSEL?ALL.filter(function(r){return r.g===GSEL}):ALL.slice();renderBar();renderTop();renderStatus();renderSrc();renderTable();renderTx()}
 
 function setLive(ok,msg){var l=document.getElementById("live");l.className="live"+(ok?"":" off");document.getElementById("livetxt").textContent=msg;
@@ -378,7 +456,7 @@ function load(){
  return api({a:"data",t:TOKEN}).then(function(r){
   if(r.err==="auth"){drop();showAuth("login","Your session has expired. Please sign in again.");return}
   if(r.err)throw new Error(r.msg||r.err);
-  ALL=fromRows(r.rows);hideAuth();renderAll();
+  ROLE=r.role||"Viewer";DV=r.dv||{};ALL=fromRows(r.rows);hideAuth();renderAll();applyRole();
   var d=new Date();$("when").textContent=d.toLocaleString([], {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
   setLive(true,"Live · auto-refresh every "+CFG.REFRESH_SEC+"s")})
  .catch(function(e){$("when").textContent="Not connected";setLive(false,e.message||"error");if(ALL.length){hideAuth();renderAll()}else{$("hl").textContent="Unable to load the dashboard data.";$("hp").textContent="Press Refresh now to try again."}})}
@@ -387,9 +465,10 @@ document.addEventListener("click",function(e){var t=e.target,b=t.closest&&t.clos
  var c=t.closest&&t.closest(".cpy");if(c){copyText(c.getAttribute("data-v"),c);return}
  if(t.id==="modal"||(t.closest&&t.closest("#mclose")))closeM()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape")closeM()});
+initUpd();
 ["sfq","sf1","sf2"].forEach(function(id){$(id).addEventListener("input",renderSrc)});
 ["xq","xf1","xf2","xf3"].forEach(function(id){$(id).addEventListener("input",renderTx)});
-$("tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;TAB=b.getAttribute("data-v");Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){x.className="tab"+(x===b?" on":"")});$("v1").style.display=TAB==="1"?"block":"none";$("v2").style.display=TAB==="2"?"block":"none";$("v3").style.display=TAB==="3"?"block":"none"});
+$("tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;TAB=b.getAttribute("data-v");Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){x.className="tab"+(x===b?" on":"")});$("v1").style.display=TAB==="1"?"block":"none";$("v2").style.display=TAB==="2"?"block":"none";$("v3").style.display=TAB==="3"?"block":"none";$("v4").style.display=TAB==="4"?"block":"none";$("gbar").style.visibility=TAB==="4"?"hidden":"visible"});
 ["q","ph","st"].forEach(function(id){document.getElementById(id).addEventListener("input",renderTable)});
 document.getElementById("rf").addEventListener("click",load);
 document.getElementById("gbar").addEventListener("change",function(e){if(e.target.id!=="gsel")return;GSEL=e.target.value;renderAll()});
