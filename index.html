@@ -124,7 +124,7 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 </div></div></header>
 <div class="wrap"><main>
 <div id="banner"></div>
-<div class="toprow"><div class="tabs" id="tabs"><button type="button" class="tab on" data-v="1">Implementation Status</button><button type="button" class="tab" data-v="2">Order Summary</button></div>
+<div class="toprow"><div class="tabs" id="tabs"><button type="button" class="tab on" data-v="1">Implementation Status</button><button type="button" class="tab" data-v="2">Order Summary</button><button type="button" class="tab" data-v="3">Source System Analysis</button></div>
 <div class="gbar" id="gbar"></div></div>
 <div id="v1">
 <section class="card summary">
@@ -136,14 +136,6 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 <section class="grid2">
 <div class="card"><h2>Entities completed at each stage, by phase</h2><div id="stages"></div></div>
 <div class="card"><h2>Progress by phase</h2><div id="phases"></div></div>
-</section>
-<section class="grid2" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
-<div class="card"><h2>Group vs source system (entities)</h2><div class="tw" id="sgm"></div></div>
-<div class="card"><h2>Source system configuration status</h2><div class="tw" id="scs"></div></div>
-</section>
-<section class="card" style="margin-bottom:14px"><h2>Entity vs source system</h2>
-<div class="tools"><input id="sfq" type="search" placeholder="Search entity" aria-label="Search entity"><select id="sf1" aria-label="Source system"></select><select id="sf2" aria-label="Configuration status"></select></div>
-<div class="tw"><table><thead><tr><th>#</th><th>Entity</th><th>Group</th><th>Source system</th><th>Version</th><th>Source system configuration</th><th></th></tr></thead><tbody id="stb"></tbody></table></div>
 </section>
 <section class="card">
 <h2>Entity tracker</h2>
@@ -160,6 +152,16 @@ footer{color:var(--mute);font-size:12px;margin-top:16px}
 <section class="card"><h2>Transactions by entity</h2>
 <div class="tools"><input id="xq" type="search" placeholder="Search entity" aria-label="Search entity"><select id="xf1" aria-label="ASP provider"></select><select id="xf2" aria-label="WO status"></select><select id="xf3" aria-label="Group"></select></div>
 <div class="tw"><table class="xt"><thead><tr><th>#</th><th>Entity</th><th>Group</th><th>ASP provider</th><th>WO status</th><th class="r">Transactions</th><th></th></tr></thead><tbody id="xtb"></tbody></table></div>
+</section>
+</div>
+<div id="v3" style="display:none">
+<section class="grid2" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)">
+<div class="card"><h2>Group vs source system (entities)</h2><div class="tw" id="sgm"></div></div>
+<div class="card"><h2>Source system configuration status</h2><div class="tw" id="scs"></div></div>
+</section>
+<section class="card" style="margin-bottom:14px"><h2>Entity vs source system</h2>
+<div class="tools"><input id="sfq" type="search" placeholder="Search entity" aria-label="Search entity"><select id="sf1" aria-label="Source system"></select><select id="sf2" aria-label="Configuration status"></select></div>
+<div class="tw"><table><thead><tr><th>#</th><th>Entity</th><th>Group</th><th>Source systems</th><th>Source system configuration</th><th></th></tr></thead><tbody id="stb"></tbody></table></div>
 </section>
 </div>
 </main></div>
@@ -186,6 +188,7 @@ function isDone(v){v=norm(v);return v==="completed"||v==="complete"||v==="done"|
 function clean(v){return String(v||"").replace(/[\u200b]/g,"").trim()}
 function num(v){var n=parseFloat(String(v||"").replace(/[^0-9.\-]/g,""));return isNaN(n)?0:n}
 var EXTRA={asp:true,wo:true,tx:true};
+function splitSrc(s){var seen={},o=[];String(s||"").split(/[,;\n\r]+/).forEach(function(p){p=p.trim();if(p&&!seen[p.toLowerCase()]){seen[p.toLowerCase()]=1;o.push(p)}});return o}
 function has(r,j){return j>=0&&String(r[j]||"").replace(/[\u200b\s]/g,"")!==""}
 function fromRows(rows){
  var h=-1,i;for(i=0;i<rows.length;i++){if(rows[i].some(function(c){return norm(c)==="property"})){h=i;break}}
@@ -199,7 +202,7 @@ function fromRows(rows){
  if(lost.length)throw new Error("Column header not found in the sheet: "+lost.join(", "));
  var out=[];
  for(i=h+1;i<rows.length;i++){var r=rows[i],n=String(r[cn]||"").replace(/[\u200b]/g,"").trim();if(!n)continue;
-  out.push({n:n,g:(cg>=0&&String(r[cg]||"").replace(/[\u200b]/g,"").trim())||"Ungrouped",i:String(r[cl]||"").replace(/[\u200b]/g,"").trim()||out.length+1,x:out.length,f:{dn:clean(r[cf[0]]),de:clean(r[cf[1]]),ie:clean(r[cf[2]]),ph:clean(r[cf[3]]),trn:clean(r[cf[4]]),tin:clean(r[cf[5]]),src:clean(r[cf[6]]),ver:clean(r[cf[7]])},ss:has(r,css),asp:clean(cap>=0?r[cap]:"")||"Not assigned",wo:clean(cwo>=0?r[cwo]:"")||"Not set",tx:num(ctc>=0?r[ctc]:""),ver:has(r,cv),trn:has(r,ct),ph:(cp>=0&&String(r[cp]||"").replace(/[\u200b]/g,"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
+  out.push({n:n,g:(cg>=0&&String(r[cg]||"").replace(/[\u200b]/g,"").trim())||"Ungrouped",i:String(r[cl]||"").replace(/[\u200b]/g,"").trim()||out.length+1,x:out.length,srcs:splitSrc(r[cf[6]]),f:{dn:clean(r[cf[0]]),de:clean(r[cf[1]]),ie:clean(r[cf[2]]),ph:clean(r[cf[3]]),trn:clean(r[cf[4]]),tin:clean(r[cf[5]]),src:clean(r[cf[6]]),ver:clean(r[cf[7]])},ss:has(r,css),asp:clean(cap>=0?r[cap]:"")||"Not assigned",wo:clean(cwo>=0?r[cwo]:"")||"Not set",tx:num(ctc>=0?r[ctc]:""),ver:has(r,cv),trn:has(r,ct),ph:(cp>=0&&String(r[cp]||"").replace(/[\u200b]/g,"").trim())||"Unassigned",st:cs.map(function(j){return isDone(r[j])?1:0})})}
  EXTRA={asp:cap>=0,wo:cwo>=0,tx:ctc>=0};
  if(!out.length)throw new Error("No entity rows found");return out}
 
@@ -310,7 +313,7 @@ function fld(l,v){return '<div class="fld"><div class="fl">'+l+'</div><div class
 function cfld(l,v){return '<div class="fld"><div class="fl">'+l+'</div><div class="fv">'+(v===""?'<span class="mu">–</span>':'<span>'+esc(v)+'</span><button type="button" class="cpy" data-v="'+esc(v)+'" aria-label="Copy '+l+'">Copy</button>')+'</div></div>'}
 function openM(r){var f=r.f;$("mt").textContent=r.n;
  $("mbody").innerHTML='<div class="mrow m5">'+fld("Entity name",esc(r.n))+fld("Group",esc(r.g))+fld("Transaction count",fmt(r.tx))+fld("Order status",'<span class="pill '+woCls(r.wo)+'">'+esc(r.wo)+'</span>')+fld("ASP provider",esc(r.asp))+'</div>'+
-  '<div class="mrow m2">'+fld("Source system",esc(f.src))+fld("Version",esc(f.ver))+'</div>'+
+  '<div class="mrow m2">'+fld("Source system",esc(r.srcs.join(", ")))+fld("Version",esc(f.ver))+'</div>'+
   '<div class="mrow m4">'+fld("DOF name",esc(f.dn))+cfld("DOF email",f.de)+cfld("IT email",f.ie)+cfld("Phone",f.ph)+'</div>'+
   '<div class="mrow m3">'+cfld("TRN",f.trn)+cfld("TIN",f.tin)+fld("Implementation phase",esc(r.ph))+'</div>';
  $("modal").style.display="flex";$("mclose").focus()}
@@ -319,23 +322,23 @@ function fbCopy(t,done){var a=document.createElement("textarea");a.value=t;a.sty
 function copyText(t,btn){var done=function(){btn.textContent="Copied ✓";btn.classList.add("ok");setTimeout(function(){btn.textContent="Copy";btn.classList.remove("ok")},1500)};
  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){fbCopy(t,done)})}else fbCopy(t,done)}
 function renderSrc(){
- var nm={};ALL.forEach(function(r){var s=r.f.src||"Not recorded",k=s.toLowerCase();if(!nm[k])nm[k]=s});
- function sv(r){return nm[(r.f.src||"Not recorded").toLowerCase()]}
- var cnt={};ALL.forEach(function(r){var s=sv(r);cnt[s]=(cnt[s]||0)+1});
+ var nm={};ALL.forEach(function(r){r.srcs.forEach(function(s){var k=s.toLowerCase();if(!nm[k])nm[k]=s})});
+ function sv(r){var a=r.srcs.map(function(s){return nm[s.toLowerCase()]});return a.length?a:["Not recorded"]}
+ var cnt={};ALL.forEach(function(r){sv(r).forEach(function(s){cnt[s]=(cnt[s]||0)+1})});
  var cols=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]||(a>b?1:-1)});
  var groups=[];ALL.forEach(function(r){if(groups.indexOf(r.g)<0)groups.push(r.g)});groups.sort();
- $("sgm").innerHTML='<table><thead><tr><th>Group</th>'+cols.map(function(c){return '<th class="r">'+esc(c)+'</th>'}).join("")+'<th class="r">Total</th></tr></thead><tbody>'+
-  groups.map(function(g){var rows=ALL.filter(function(r){return r.g===g});return '<tr><td'+(GSEL&&g===GSEL?' style="font-weight:700"':'')+'>'+esc(g)+'</td>'+cols.map(function(c){var n=rows.filter(function(r){return sv(r)===c}).length;return '<td class="r">'+(n||'<span class="mu">–</span>')+'</td>'}).join("")+'<td class="r"><b>'+rows.length+'</b></td></tr>'}).join("")+
-  '<tr class="tot"><td>Total</td>'+cols.map(function(c){return '<td class="r">'+cnt[c]+'</td>'}).join("")+'<td class="r">'+ALL.length+'</td></tr></tbody></table>'+(GSEL?'<div class="legend">Showing all groups for comparison; the selected group is in bold.</div>':'');
- var sa={},so=[];A.forEach(function(r){var s=sv(r);if(!sa[s]){sa[s]={n:0,c:0};so.push(s)}sa[s].n++;sa[s].c+=r.st[3]});
+ $("sgm").innerHTML='<table><thead><tr><th>Group</th>'+cols.map(function(c){return '<th class="r">'+esc(c)+'</th>'}).join("")+'<th class="r">Entities</th></tr></thead><tbody>'+
+  groups.map(function(g){var rows=ALL.filter(function(r){return r.g===g});return '<tr><td'+(GSEL&&g===GSEL?' style="font-weight:700"':'')+'>'+esc(g)+'</td>'+cols.map(function(c){var n=rows.filter(function(r){return sv(r).indexOf(c)>=0}).length;return '<td class="r">'+(n||'<span class="mu">–</span>')+'</td>'}).join("")+'<td class="r"><b>'+rows.length+'</b></td></tr>'}).join("")+
+  '<tr class="tot"><td>Total</td>'+cols.map(function(c){return '<td class="r">'+cnt[c]+'</td>'}).join("")+'<td class="r">'+ALL.length+'</td></tr></tbody></table><div class="legend">An entity with more than one source system is counted under each of them. The Entities column and total row show distinct entities.'+(GSEL?' The selected group is in bold.':'')+'</div>';
+ var sa={},so=[];A.forEach(function(r){sv(r).forEach(function(s){if(!sa[s]){sa[s]={n:0,c:0};so.push(s)}sa[s].n++;sa[s].c+=r.st[3]})});
  so.sort(function(a,b){return sa[b].n-sa[a].n||(a>b?1:-1)});
- var tn=0,tc=0;
- $("scs").innerHTML='<table><thead><tr><th>Source system</th><th class="r">Entities</th><th class="r">Configured</th><th class="r">Pending</th></tr></thead><tbody>'+so.map(function(s){var x=sa[s];tn+=x.n;tc+=x.c;return '<tr><td>'+esc(s)+'</td><td class="r">'+x.n+'</td><td class="r">'+(x.c||'<span class="mu">–</span>')+'</td><td class="r">'+((x.n-x.c)||'<span class="mu">–</span>')+'</td></tr>'}).join("")+'<tr class="tot"><td>Total</td><td class="r">'+tn+'</td><td class="r">'+tc+'</td><td class="r">'+(tn-tc)+'</td></tr></tbody></table>';
+ var tc=A.filter(function(r){return r.st[3]}).length;
+ $("scs").innerHTML='<table><thead><tr><th>Source system</th><th class="r">Entities</th><th class="r">Configured</th><th class="r">Pending</th></tr></thead><tbody>'+so.map(function(s){var x=sa[s];return '<tr><td>'+esc(s)+'</td><td class="r">'+x.n+'</td><td class="r">'+(x.c||'<span class="mu">–</span>')+'</td><td class="r">'+((x.n-x.c)||'<span class="mu">–</span>')+'</td></tr>'}).join("")+'<tr class="tot"><td>Total (distinct entities)</td><td class="r">'+A.length+'</td><td class="r">'+tc+'</td><td class="r">'+(A.length-tc)+'</td></tr></tbody></table>';
  fillSel("sf1","All source systems",so);
  fillSel("sf2","All configuration statuses",["Completed","Pending"]);
  var q=$("sfq").value.toLowerCase(),f1=$("sf1").value,f2=$("sf2").value;
- var L=A.filter(function(r){var c=r.st[3]?"Completed":"Pending";return(!q||r.n.toLowerCase().indexOf(q)>=0)&&(!f1||sv(r)===f1)&&(!f2||c===f2)}).sort(function(a,b){var x=sv(a),y=sv(b);return x===y?(a.n>b.n?1:-1):(x>y?1:-1)});
- $("stb").innerHTML=L.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td><td>'+esc(r.g)+'</td><td>'+esc(sv(r))+'</td><td>'+(r.f.ver?esc(r.f.ver):'<span class="mu">–</span>')+'</td><td><span class="pill '+(r.st[3]?'p-ok':'p-warn')+'">'+(r.st[3]?'Completed':'Pending')+'</span></td><td>'+eye(r)+'</td></tr>'}).join("")||'<tr><td colspan="7">No entities match these filters.</td></tr>';
+ var L=A.filter(function(r){var c=r.st[3]?"Completed":"Pending";return(!q||r.n.toLowerCase().indexOf(q)>=0)&&(!f1||sv(r).indexOf(f1)>=0)&&(!f2||c===f2)}).sort(function(a,b){var x=sv(a).join(", "),y=sv(b).join(", ");return x===y?(a.n>b.n?1:-1):(x>y?1:-1)});
+ $("stb").innerHTML=L.map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="nm">'+esc(r.n)+'</td><td>'+esc(r.g)+'</td><td>'+esc(sv(r).join(", "))+'</td><td><span class="pill '+(r.st[3]?'p-ok':'p-warn')+'">'+(r.st[3]?'Completed':'Pending')+'</span></td><td>'+eye(r)+'</td></tr>'}).join("")||'<tr><td colspan="6">No entities match these filters.</td></tr>';
 }
 function renderAll(){A=GSEL?ALL.filter(function(r){return r.g===GSEL}):ALL.slice();renderBar();renderTop();renderStatus();renderSrc();renderTable();renderTx()}
 
@@ -386,7 +389,7 @@ document.addEventListener("click",function(e){var t=e.target,b=t.closest&&t.clos
 document.addEventListener("keydown",function(e){if(e.key==="Escape")closeM()});
 ["sfq","sf1","sf2"].forEach(function(id){$(id).addEventListener("input",renderSrc)});
 ["xq","xf1","xf2","xf3"].forEach(function(id){$(id).addEventListener("input",renderTx)});
-$("tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;TAB=b.getAttribute("data-v");Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){x.className="tab"+(x===b?" on":"")});$("v1").style.display=TAB==="1"?"block":"none";$("v2").style.display=TAB==="2"?"block":"none"});
+$("tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;TAB=b.getAttribute("data-v");Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){x.className="tab"+(x===b?" on":"")});$("v1").style.display=TAB==="1"?"block":"none";$("v2").style.display=TAB==="2"?"block":"none";$("v3").style.display=TAB==="3"?"block":"none"});
 ["q","ph","st"].forEach(function(id){document.getElementById(id).addEventListener("input",renderTable)});
 document.getElementById("rf").addEventListener("click",load);
 document.getElementById("gbar").addEventListener("change",function(e){if(e.target.id!=="gsel")return;GSEL=e.target.value;renderAll()});
